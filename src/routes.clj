@@ -8,5 +8,7 @@
 (defroutes root-handler
   (GET "/test" [] #'test-handler)
   (GET "/patients" [] #'patient/get-patients-handler)
-  (GET "/patient/:id" [] #'patient/get-patient-by-id-handler)
+  (GET "/patient/:id" [] #'patient/get-patient-handler)
+  (POST "/patient" [] #'patient/create-handler)
+  (PUT "/patient:id" [] #'patient/update-handler)
   (route/not-found "Not found"))
