@@ -1,0 +1,21 @@
+ {:table "patients"
+  :data [{:id "SLKJC"
+          :name "Alex Alex"
+          :address "Adler, Mira 13"
+          :gender "male"
+          :policy "number"}
+         {:id "LKSFF"
+          :name "Alex Alex"
+          :address "Adler, Mira 13"
+          :gender "male"
+          :policy "number"}
+         {:id "DLKFJ"
+          :name "Alex Alex"
+          :address "Adler, Mira 13"
+          :gender "male"
+          :policy "number"}
+         {:id "DJFLK"
+          :name "Alex Alex"
+          :address "Adler, Mira 13"
+          :gender "male"
+          :policy "number"}]}
