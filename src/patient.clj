@@ -3,9 +3,6 @@
   (:require [db.core :refer [db]]
             [clojure.java.jdbc :as j]))
 
-
-
-
 (defn- get-patients [] (let [query "select * from patients"]
                          (j/query db query)))
 
