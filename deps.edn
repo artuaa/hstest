@@ -1,0 +1,15 @@
+{:paths
+ ["src" "tests" "resources"]
+ :deps
+ {org.clojure/clojurescript {:mvn/version "1.10.773"}
+  ring/ring-core {:mvn/version "1.8.2"}
+  ring/ring-json {:mvn/version "0.5.0"}
+  ring-logger/ring-logger {:mvn/version "1.0.1"}
+  ring/ring-jetty-adapter {:mvn/version "1.8.2"}
+  compojure/compojure {:mvn/version "1.6.1"}
+  org.clojure/java.jdbc {:mvn/version "0.7.11"}
+  org.postgresql/postgresql {:mvn/version "42.2.5"}}
+ :aliases {:nREPL
+           {:extra-deps
+            {nrepl/nrepl {:mvn/version "0.8.3"}
+             cider/piggieback {:mvn/version "0.4.2"}}}}}

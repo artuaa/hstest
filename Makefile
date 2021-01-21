@@ -1,3 +1,8 @@
+run:
+	clj -X main/-main
+repl:
+	clj -A:nREPL -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]"
+
 db.run:
 	docker run \
 	--name=local-postgres \
