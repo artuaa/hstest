@@ -1,7 +1,9 @@
-run:
+front.repl:
+	clj -M:dev
+server.run:
 	clj -X main/-main
-repl:
-	clj -A:nREPL -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]"
+server.repl:
+	clj -A:nREPL -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --interactive --color
 
 db.run:
 	docker run \

@@ -1,5 +1,5 @@
 {:paths
- ["src" "tests" "resources"]
+ ["src/clj" "src/cljs"  "resources"]
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.773"}
   ring/ring-core {:mvn/version "1.8.2"}
@@ -10,6 +10,12 @@
   org.clojure/java.jdbc {:mvn/version "0.7.11"}
   org.postgresql/postgresql {:mvn/version "42.2.5"}}
  :aliases {:nREPL
+           :extra-paths ["out"]
            {:extra-deps
             {nrepl/nrepl {:mvn/version "0.8.3"}
-             cider/piggieback {:mvn/version "0.4.2"}}}}}
+             cider/piggieback {:mvn/version "0.4.2"}}}
+           :dev {:main-opts ["-m"  "cljs.main"
+                             "-ro" "{:static-dir,[\".\",\"out\",\"resources\"]}"
+                             "-w"  "src/cljs"
+                             "-c"  "main"
+                             "-r"]}}}

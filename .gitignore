@@ -12,3 +12,5 @@ figwheel_server.log
 .calva
 .clj-kondo
 .lsp
+.cpcache
+out

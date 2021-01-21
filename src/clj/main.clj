@@ -18,3 +18,7 @@
   (let [port 8080]
     (println (str "Server started: " port))
     (adapter/run-jetty #'app {:port port})))
+
+
+(comment
+  (-main))
