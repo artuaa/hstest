@@ -1,7 +1,8 @@
 {:paths
- ["src/clj" "src/cljs"  "resources"]
+ ["src/clj" "src/cljs"  "resources", "target"]
  :deps
- {org.clojure/clojurescript {:mvn/version "1.10.773"}
+ {org.clojure/clojurescript {:mvn/version "1.10.764"}
+  com.bhauman/figwheel-main {:mvn/version "0.2.11"}
   ring/ring-core {:mvn/version "1.8.2"}
   ring/ring-json {:mvn/version "0.5.0"}
   ring-logger/ring-logger {:mvn/version "1.0.1"}
@@ -14,8 +15,4 @@
            {:extra-deps
             {nrepl/nrepl {:mvn/version "0.8.3"}
              cider/piggieback {:mvn/version "0.4.2"}}}
-           :dev {:main-opts ["-m"  "cljs.main"
-                             "-ro" "{:static-dir,[\".\",\"out\",\"resources\"]}"
-                             "-w"  "src/cljs"
-                             "-c"  "main"
-                             "-r"]}}}
+           :dev {:main-opts ["-m"  "figwheel.main" "--build" "dev" "--repl"]}}}

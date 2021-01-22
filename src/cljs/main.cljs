@@ -1,3 +1,4 @@
 (ns main)
 
-(js/console.log "Hello, this is cljs!!!")
+(js/console.log "piu piu piu!")
+
