@@ -2,18 +2,12 @@
  ["src/clj" "src/cljs"  "resources", "target"]
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.764"}
+  reagent/reagent {:mvn/version "1.0.0"}
   com.bhauman/figwheel-main {:mvn/version "0.2.11"}
-  reagent/reagent                   {:mvn/version "0.10.0"}
   ring/ring-core {:mvn/version "1.8.2"}
   ring/ring-json {:mvn/version "0.5.0"}
   ring-logger/ring-logger {:mvn/version "1.0.1"}
   ring/ring-jetty-adapter {:mvn/version "1.8.2"}
   compojure/compojure {:mvn/version "1.6.1"}
   org.clojure/java.jdbc {:mvn/version "0.7.11"}
-  org.postgresql/postgresql {:mvn/version "42.2.5"}}
- :aliases {:nREPL
-           :extra-paths ["out"]
-           {:extra-deps
-            {nrepl/nrepl {:mvn/version "0.8.3"}
-             cider/piggieback {:mvn/version "0.4.2"}}}
-           :dev {:main-opts ["-m"  "figwheel.main" "--build" "dev" "--repl"]}}}
+  org.postgresql/postgresql {:mvn/version "42.2.5"}}}

@@ -1,9 +1,7 @@
-front.repl:
-	clj -M:dev
-server.run:
+run:
 	clj -X main/-main
-server.repl:
-	clj -A:nREPL -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --interactive --color
+repl:
+	clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "0.5.3"}}}' -m nrepl.cmdline
 
 db.run:
 	docker run \
