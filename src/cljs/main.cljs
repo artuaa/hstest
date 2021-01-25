@@ -4,18 +4,22 @@
    [reagent.core :as r]
    [hs.http :as http]))
 
-
-(def route (r/atom {:path "patient" :id "2b0030e8-3b61-4022-bc3f-d63a2cb214ad"}))
+(def route (r/atom {:path "patient" :id "f64d1806-35e0-42b6-b7ff-25f37576229c"}))
 
 (def patients (r/atom []))
 
-(defn get-patients [] (http/GET "http://localhost:8080/patients" #(reset! patients (:patients %))))
+(defn get-patients [] (http/GET "/api/patients" #(reset! patients (:patients %))))
+
 
 (get-patients)
 
 (defn delete-patient [id] (when (js/confirm "Delete patient?")
-                            (http/DELETE (str "http://localhost:8080/patient/" id)
+                            (http/DELETE (str "/api/patient/" id)
                               (fn [_] (swap! patients (fn [old] (remove (fn [v] (= (:id v) id)) old)))))))
+
+(defn save-patient [patient] (http/POST "/api/patient" (:patient patient) #(js/alert "Patient saved")))
+
+(defn update-patient [patient] (http/PUT (str "/api/patient/" (:id patient)) {:patient patient} #(js/alert "Patient updated")))
 
 (defn patient-table []
   (fn []
@@ -51,7 +55,9 @@
            [:label {:for "Address"} "Address"]
            [:input {:id "Address" :placeholder "Address" :on-change (change :address) :value (:address @patient)}]
            [:label {:for "Policy"} "Policy"]
-           [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]]))))
+           [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
+           [:button {:on-click #(do (.preventDefault %)
+                                    (update-patient @patient))} "Save"]]))))
 
 (defn patient-page []
   (fn [] (if (empty? @patients) [:span "Loading"] (patient-form (first (filter #(= (:id %) (:id @route)) @patients))))))

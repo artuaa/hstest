@@ -11,9 +11,9 @@
 
 (defroutes root-handler
   (GET "/" [] index-handler)
-  (GET "/patients" [] #'patient/get-many)
-  (GET "/patient/:id" [] #'patient/get-one-handler)
-  (POST "/patient" [] #'patient/create-handler)
-  (PUT "/patient/:id" [] #'patient/update-handler)
-  (DELETE "/patient/:id" [] #'patient/delete-handler)
+  (GET "/api/patients" [] #'patient/get-many)
+  (GET "/api/patient/:id" [] #'patient/get-one-handler)
+  (POST "/api/patient" [] #'patient/create-handler)
+  (PUT "/api/patient/:id" [] #'patient/update-handler)
+  (DELETE "/api/patient/:id" [] #'patient/delete-handler)
   (route/not-found "Not found"))

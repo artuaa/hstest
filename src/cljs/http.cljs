@@ -11,3 +11,13 @@
                                    (.then  #(.json %))
                                    (.catch #(on-success nil))
                                    (.then #(on-success (cw/keywordize-keys (js->clj %))))))
+
+(defn POST [url data on-success] (-> (js/fetch url #js {"method" "post" "data" (clj->js data)})
+                                     (.then  #(.json %))
+                                     (.catch #(on-success nil))
+                                     (.then #(on-success (cw/keywordize-keys (js->clj %))))))
+
+(defn PUT [url data on-success] (-> (js/fetch url #js {"method" "put" "data" (clj->js data)})
+                                    (.then  #(.json %))
+                                    (.catch #(on-success nil))
+                                    (.then #(on-success (cw/keywordize-keys (js->clj %))))))

@@ -15,8 +15,10 @@
                               (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
 ;; TODO: validate errors 
 ;; TODO: check not found
-(defn update-handler [req] (let [upd (j/update! db :patients (get-in req [:body :patient]) ["id = ?" (get-in req [:params :id])])]
-                             {:status 200}))
+;; (defn update-handler [req] (do (println req)
+;;                                (let [upd (j/update! db :patients (dissoc (get-in req [:body :patient]) :id) ["id = ?" (get-in req [:params :id])])]
+;;                                  {:status 200})))
+(defn update-handler [req] {:status 200})
 
 (defn create-handler [req] (let [entity (first (j/insert! db :patients
                                                           (assoc (get-in req [:body :patient]) :id  (.toString (java.util.UUID/randomUUID)))))]
