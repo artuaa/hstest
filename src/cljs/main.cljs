@@ -4,22 +4,24 @@
    [reagent.core :as r]
    [hs.http :as http]))
 
+(defn get-url [path] (str "http://localhost:8080" path))
+
 (def route (r/atom {:path "patient" :id "f64d1806-35e0-42b6-b7ff-25f37576229c"}))
 
 (def patients (r/atom []))
 
-(defn get-patients [] (http/GET "/api/patients" #(reset! patients (:patients %))))
+(defn get-patients [] (http/GET (get-url "/api/patients") #(reset! patients (:patients %))))
 
 
 (get-patients)
 
 (defn delete-patient [id] (when (js/confirm "Delete patient?")
-                            (http/DELETE (str "/api/patient/" id)
+                            (http/DELETE (str (get-url "/api/patient/") id)
                               (fn [_] (swap! patients (fn [old] (remove (fn [v] (= (:id v) id)) old)))))))
 
-(defn save-patient [patient] (http/POST "/api/patient" (:patient patient) #(js/alert "Patient saved")))
+(defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} #(js/alert "Patient saved")))
 
-(defn update-patient [patient] (http/PUT (str "/api/patient/" (:id patient)) {:patient patient} #(js/alert "Patient updated")))
+(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") {:id patient}) {:patient patient} #(js/alert "Patient updated")))
 
 (defn patient-table []
   (fn []
@@ -44,7 +46,7 @@
     (fn []
       (if (nil? patient) [:span "loading"]
           [:form.form
-           [:label {:for "Name"} "Name" (:name patient)]
+           [:label {:for "Name!"} "Name" (:name patient)]
            [:input {:id "Name" :placeholder "Name" :on-change (change :name)  :value (:name @patient)}]
            [:label {:for "Gender"} "Gender"]
            [:select {:id "Gender" :placeholder "Gender" :on-change (change :gender) :value (:gender @patient)}
@@ -77,3 +79,21 @@
 
 
 (defonce start-up (do (mount) true))
+
+(comment
+  (deref patients)
+         (update-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
+                          :name "Alex Alex"
+                          :birthdate nil
+                          :address "Adler, Mira 13"
+                          :gender "male"
+                          :policy "number"
+                          })
+         (create-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
+                          :name "Alex Alex"
+                          :birthdate nil
+                          :address "Adler, Mira 13"
+                          :gender "male"
+                          :policy "number"
+                          })
+         )
