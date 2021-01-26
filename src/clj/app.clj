@@ -13,6 +13,5 @@
       (wrap-cors :access-control-allow-origin [#"http://localhost:9500"] :access-control-allow-methods [:get :put :post :delete])
       (wrap-resource "public")
       wrap-json-response
-      wrap-json-body
-      wrap-with-logger
-      (wrap-json-body {:keywords? true})))
+      (wrap-json-body {:keywords? true})
+      wrap-with-logger))

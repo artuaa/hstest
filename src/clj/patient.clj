@@ -20,11 +20,10 @@
 ;;                                  {:status 200})))
 (defn update-handler [req] {:status 200 :body {:ok true :piu "piu"}})
 
-;; (defn create-handler [req] (let [entity (first (j/insert! db :patients
-;;                                                           (assoc (get-in req [:body :patient]) :id  (.toString (java.util.UUID/randomUUID)))))]
-;;                              {:status 200 :body {:id (:id entity)}}))
+(defn create-handler [req] (let [entity (first (j/insert! db :patients
+                                                          (assoc (get-in req [:body :patient]) :id  (.toString (java.util.UUID/randomUUID)))))]
+                             {:status 200 :body {:id (:id entity)}}))
 
-(defn create-handler [req] (do (println (:body req)) {:status 200}))
 
 (defn delete-handler [req] (let [count (first (j/delete! db :patients ["id = ?" (get-in req [:params :id])]))]
                              (if (zero? count) {:status 404} {:status 200})))

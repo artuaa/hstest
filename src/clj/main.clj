@@ -1,11 +1,17 @@
-(ns hs.main
+(ns main
   (:require [ring.adapter.jetty :as adapter]
             [app :refer [app]])
   (:gen-class))
 
-(defn -main [& args]
+(def server (atom nil))
+
+(defn start []
   (let [port 8080]
     (println (str "Server started: " port))
-    (adapter/run-jetty #'app {:port port})))
+    (reset! atom (adapter/run-jetty #'app {:port port}))))
 
-(-main)
+(defn stop [] (@server))
+
+(defn -main [& args]
+  (start))
+
