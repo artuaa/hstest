@@ -13,21 +13,24 @@
                                   patient (first
                                            (j/query db query))]
                               (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
-;; TODO: validate errors 
-;; TODO: check not found
-;; (defn update-handler [req] (do (println req)
-;;                                (let [upd (j/update! db :patients (dissoc (get-in req [:body :patient]) :id) ["id = ?" (get-in req [:params :id])])]
-;;                                  {:status 200})))
-(defn update-handler [req] {:status 200 :body {:ok true :piu "piu"}})
+(defn update-handler [req] (println req)
+  (let [id (get-in req [:params :id])
+        entity (dissoc (get-in req [:body :patient]) :id)
+        upd? (-> (j/update! db :patients entity ["id = ?" id])
+                 first count zero? not)]
+                   {:status 200 :body {:updated upd?}}))
 
-(defn create-handler [req] (let [entity (first (j/insert! db :patients
-                                                          (assoc (get-in req [:body :patient]) :id  (.toString (java.util.UUID/randomUUID)))))]
-                             {:status 200 :body {:id (:id entity)}}))
+(defn- gen-uuid [] (.toString (java.util.UUID/randomUUID)))
+
+(defn create-handler [req] (println req)
+  (let [id (get-in req [:params :id])
+        entity (assoc (get-in req [:body :patient]) :id (gen-uuid))
+        crt? (not nil? (j/insert! db :patients entity))]
+                   {:status 200 :body {:created crt?}}))
 
 
 (defn delete-handler [req] (let [count (first (j/delete! db :patients ["id = ?" (get-in req [:params :id])]))]
                              (if (zero? count) {:status 404} {:status 200})))
 
 (comment
-  (j/insert! db :patients {:id "123234" :name "hello"})
-)
+  (j/insert! db :patients {:id "1" :name "hello"}))
