@@ -17,7 +17,7 @@
   (let [id (get-in req [:params :id])
         entity (dissoc (get-in req [:body :patient]) :id)
         upd? (-> (j/update! db :patients entity ["id = ?" id])
-                 first count zero? not)]
+                 first zero? not)]
                    {:status 200 :body {:updated upd?}}))
 
 (defn- gen-uuid [] (.toString (java.util.UUID/randomUUID)))
@@ -25,7 +25,7 @@
 (defn create-handler [req] (println req)
   (let [id (get-in req [:params :id])
         entity (assoc (get-in req [:body :patient]) :id (gen-uuid))
-        crt? (not nil? (j/insert! db :patients entity))]
+        crt? (not (nil? (j/insert! db :patients entity)))]
                    {:status 200 :body {:created crt?}}))
 
 

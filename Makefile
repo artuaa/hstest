@@ -1,8 +1,6 @@
 run:
 	clj -X main/-main
 repl:
-	clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "0.5.3"}}}' -m nrepl.cmdline
-cljs:
 	clojure -Sdeps '{:deps {nrepl/nrepl {:mvn/version "0.8.3"} cider/cider-nrepl {:mvn/version "0.25.7"} cider/piggieback {:mvn/version "0.5.2"}}}'  -m nrepl.cmdline --middleware "[cider.nrepl/cider-middleware cider.piggieback/wrap-cljs-repl]" --interactive
 
 db.run:

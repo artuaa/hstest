@@ -21,7 +21,8 @@
 
 (defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} #(js/alert "Patient saved")))
 
-(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") {:id patient}) {:patient patient} #(js/alert "Patient updated")))
+(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} #(js/alert "Patient updated")))
+
 
 (defn patient-table []
   (fn []
@@ -83,14 +84,13 @@
 (comment
   (deref patients)
          (update-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
-                          :name "Alex Alex"
+                          :name "My update"
                           :birthdate nil
                           :address "Adler, Mira 13"
                           :gender "male"
                           :policy "number"
                           })
-         (create-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
-                          :name "Alex Alex"
+         (create-patient {:name "Alex Alex"
                           :birthdate nil
                           :address "Adler, Mira 13"
                           :gender "male"
