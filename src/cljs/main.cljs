@@ -4,9 +4,13 @@
    [reagent.core :as r]
    [hs.http :as http]))
 
+(def route (r/atom {:path "patient" :id "f64d1806-35e0-42b6-b7ff-25f37576229c"}))
+
+(defn open-main []
+  (reset! route {:path ""}))
+
 (defn get-url [path] (str "http://localhost:8080" path))
 
-(def route (r/atom {:path "patient" :id "f64d1806-35e0-42b6-b7ff-25f37576229c"}))
 
 (def patients (r/atom []))
 
@@ -19,9 +23,11 @@
                             (http/DELETE (str (get-url "/api/patient/") id)
                               (fn [_] (swap! patients (fn [old] (remove (fn [v] (= (:id v) id)) old)))))))
 
-(defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} #(js/alert "Patient saved")))
+(defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} (fn [](js/alert "Patient saved")
+                                                                                          (open-main))))
 
-(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} #(js/alert "Patient updated")))
+(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
+                                                                                                            (open-main))))
 
 
 (defn patient-table []
@@ -66,10 +72,10 @@
   (fn [] (if (empty? @patients) [:span "Loading"] (patient-form (first (filter #(= (:id %) (:id @route)) @patients))))))
 
 (defn app []
-  (let [path  (:path @route)]
-    (cond
-      (= path "patient") patient-page
-      :else patient-table)))
+  (let [path (:path @route)]
+    (fn [](cond
+          (= path "patient") patient-page
+           :else patient-table))))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))
