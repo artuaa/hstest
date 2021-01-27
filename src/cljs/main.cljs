@@ -89,6 +89,7 @@
 
 (comment
   (deref patients)
+  (deref route)
          (update-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
                           :name "My update"
                           :birthdate nil

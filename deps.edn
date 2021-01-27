@@ -10,4 +10,5 @@
   ring/ring-jetty-adapter {:mvn/version "1.8.2"}
   compojure/compojure {:mvn/version "1.6.1"}
   org.clojure/java.jdbc {:mvn/version "0.7.11"}
-  org.postgresql/postgresql {:mvn/version "42.2.5"}}}
+  org.postgresql/postgresql {:mvn/version "42.2.5"}
+  clj-time/clj-time {:mvn/version "0.15.2"}}}
