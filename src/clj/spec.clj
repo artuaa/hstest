@@ -5,10 +5,10 @@
 (s/def ::->date
   (s/conformer
    (fn [value]
-   (try
-     read-instant-date
-     (catch Exception e
-       ::s/invalid)))))
+     (try
+       read-instant-date
+       (catch Exception e
+         ::s/invalid)))))
 
 (defn int-len [val] (-> val
                         .toString
@@ -16,13 +16,6 @@
 
 (s/def ::ne-string
   (s/and string? not-empty))
-  
-  ;; id VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
-  ;; name VARCHAR(255) NOT NULL,
-  ;; birthDate DATE,
-  ;; address VARCHAR(255),
-  ;; gender VARCHAR(15),
-  ;; policy VARCHAR(255)
 
 (s/def :patient/id ::ne-string)
 (s/def :patient/name ::ne-string)
@@ -34,9 +27,10 @@
                         ::ne-string
                         (s/conformer clojure.string/lower-case)
                         (fn [val] (contains? #{"male" "female"} val))))
+
 (s/def :patient/policy (s/and
                         int?
-                        (fn [val](= int-len) 16)))
+                        (fn [val] (= (int-len val) 16))))
 (s/def ::patient
   (s/keys :req-un [:patient/name
                    :patient/birthdate
@@ -45,25 +39,20 @@
                    :patient/policy]
           :opt-un [:patient/id]))
 
-(def p {:id "hello"
-    :name "Alex"
-    :gender "male"
-    :birthdate "2023"
-    :address "Moscow, Red Square"
-    :policy 2344})
-
-(s/valid? ::patient p)
-
 (def spec-errors
   {::->date "invalid date"})
-
-(s/conform ::->date "2134-12-33sldklf")
-
-(get-message {:via [::->date]})
-
 
 (defn get-message
   [problem]
   (let [{:keys [via]} problem
         spec (last via)]
     (get spec-errors spec)))
+
+(comment (def p {:id "hello"
+                 :name "Alex"
+                 :gender "mALe"
+                 :birthdate "2023"
+                 :address "Moscow, Red Square"
+                 :policy 1111111111111111})
+         (s/explain-data ::patient p)
+         (s/conform ::patient p))
