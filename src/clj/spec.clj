@@ -2,11 +2,16 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.instant :refer [read-instant-date]]))
 
+
 (s/def ::->date
   (s/conformer
    (fn [value]
      (try
-       read-instant-date
+       (-> (read-instant-date "2012")
+           (.getTime)
+           (java.time.Instant/ofEpochMilli)
+           (.atZone (java.time.ZoneId/of "UTC"))
+           (.toLocalDateTime))
        (catch Exception e
          ::s/invalid)))))
 
@@ -39,14 +44,11 @@
                    :patient/policy]
           :opt-un [:patient/id]))
 
-(def spec-errors
-  {::->date "invalid date"})
 
-(defn get-message
-  [problem]
-  (let [{:keys [via]} problem
-        spec (last via)]
-    (get spec-errors spec)))
+(defn validate [val] (if (s/valid? ::patient val)
+                       [true (s/conform ::patient val)]
+                       [false (s/explain-data ::patient val)]))
+
 
 (comment (def p {:id "hello"
                  :name "Alex"
@@ -54,5 +56,8 @@
                  :birthdate "2023"
                  :address "Moscow, Red Square"
                  :policy 1111111111111111})
-         (s/explain-data ::patient p)
-         (s/conform ::patient p))
+         (s/valid? :hs/patient p)
+         (s/explain-data :hs/patient p)
+         (s/conform :hs/patient p)
+         (s/conform :patient/birthdate "2933")
+         (s/conform ::->date "2012-11-11"))
