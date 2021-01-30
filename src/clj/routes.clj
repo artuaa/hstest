@@ -9,6 +9,7 @@
                            :body (-> "public/index.html" io/resource slurp)})
 
 (defroutes root-handler
+  (GET "/health" [] "ok")
   (GET "/" [] index-handler)
   (context "/api" [] (GET "/patients" [] #'patient/get-many)
     (GET "/patient/:id" [] #'patient/get-one-handler)
