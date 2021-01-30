@@ -2,7 +2,8 @@ run:
 	clj -X main/-main
 repl:
 	clojure -Sdeps '{:deps {nrepl/nrepl {:mvn/version "0.8.3"} cider/cider-nrepl {:mvn/version "0.25.7"} cider/piggieback {:mvn/version "0.5.2"}}}'  -m nrepl.cmdline --middleware "[cider.nrepl/cider-middleware cider.piggieback/wrap-cljs-repl]" --interactive
-
+test:
+	clj -M:test
 db.run:
 	docker run \
 	--name=local-postgres \

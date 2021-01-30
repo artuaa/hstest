@@ -1,21 +1,25 @@
  {:table "patients"
-  :data [{:id "SLKJC"
+  :data [{:id 1
           :name "Alex Alex"
           :address "Adler, Mira 13"
+          :birthdate "2000-01-01"
           :gender "male"
-          :policy "number"}
-         {:id "LKSFF"
+          :policy "1234123412341234"}
+         {:id 2
           :name "Alex Alex"
           :address "Adler, Mira 13"
+          :birthdate "2000-01-02"
           :gender "male"
-          :policy "number"}
-         {:id "DLKFJ"
-          :name "Alex Alex"
+          :policy "1234123412341234"}
+         {:id 3
+          :name "Luci"
           :address "Adler, Mira 13"
-          :gender "male"
-          :policy "number"}
-         {:id "DJFLK"
-          :name "Alex Alex"
+          :birthdate "2000-01-03"
+          :gender "female"
+          :policy "1234123412341234"}
+         {:id 4
+          :name "Lew"
           :address "Adler, Mira 13"
-          :gender "male"
-          :policy "number"}]}
+          :birthdate "2000-01-04"
+          :gender "female"
+          :policy "1234123412341234"}]}
