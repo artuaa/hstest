@@ -35,10 +35,8 @@
                  first zero? not)]
     {:status 200 :body {:updated upd?}}))
 
-(defn- gen-uuid [] (.toString (java.util.UUID/randomUUID)))
-
 (defn create-handler [req] (println req)
-  (let [entity (assoc (-> req :body :patient) :id (gen-uuid))
+  (let [entity (-> req :body :patient)
         [ok? result] (spec/validate entity)]
     (if ok? (do (j/insert! db :patients result)
                 {:status 200})  {:status 400})))
