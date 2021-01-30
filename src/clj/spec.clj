@@ -15,10 +15,6 @@
        (catch Exception e
          ::s/invalid)))))
 
-(defn int-len [val] (-> val
-                        .toString
-                        count))
-
 (s/def ::ne-string
   (s/and string? not-empty))
 
@@ -34,8 +30,8 @@
                         (fn [val] (contains? #{"male" "female"} val))))
 
 (s/def :patient/policy (s/and
-                        int?
-                        (fn [val] (= (int-len val) 16))))
+                        ::ne-string
+                        (fn [val] (= (count val) 16))))
 (s/def ::patient
   (s/keys :req-un [:patient/name
                    :patient/birthdate
@@ -48,7 +44,7 @@
 (defn validate [val] (let [result (s/conform ::patient val)]
  (if (= result :clojure.spec.alpha/invalid)
    [false (s/explain-data ::patient val)]
-   [true result]))
+   [true result])))
 
 
 (comment (def p {:id 1234
@@ -58,8 +54,7 @@
                  :address "Moscow, Red Square"
                  :policy 1111111111111111})
          (validate p)
-         (s/valid? :hs/patient p)
+         (s/valid? :patient/policy "1234123412341234")
          (s/explain-data :hs/patient p)
-         (s/conform :hs/patient p)
          (s/conform :patient/birthdate "2933")
          (s/conform ::->date "2012-11-11"))

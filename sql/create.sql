@@ -4,5 +4,5 @@ CREATE TABLE patients (
   birthDate DATE,
   address VARCHAR(255),
   gender VARCHAR(15),
-  policy bigint
+  policy VARCHAR(255)
 );
