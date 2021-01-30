@@ -22,7 +22,7 @@
 (s/def ::ne-string
   (s/and string? not-empty))
 
-(s/def :patient/id ::ne-string)
+(s/def :patient/id int?)
 (s/def :patient/name ::ne-string)
 (s/def :patient/birthdate (s/and
                            ::ne-string
@@ -45,17 +45,19 @@
           :opt-un [:patient/id]))
 
 
-(defn validate [val] (if (s/valid? ::patient val)
-                       [true (s/conform ::patient val)]
-                       [false (s/explain-data ::patient val)]))
+(defn validate [val] (let [result (s/conform ::patient val)]
+ (if (= result :clojure.spec.alpha/invalid)
+   [false (s/explain-data ::patient val)]
+   [true result]))
 
 
-(comment (def p {:id "hello"
+(comment (def p {:id 1234
                  :name "Alex"
                  :gender "mALe"
                  :birthdate "2023"
                  :address "Moscow, Red Square"
                  :policy 1111111111111111})
+         (validate p)
          (s/valid? :hs/patient p)
          (s/explain-data :hs/patient p)
          (s/conform :hs/patient p)

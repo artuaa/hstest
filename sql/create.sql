@@ -1,8 +1,8 @@
 CREATE TABLE patients (
-  id VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
+  id bigserial NOT NULL UNIQUE PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   birthDate DATE,
   address VARCHAR(255),
   gender VARCHAR(15),
-  policy VARCHAR(255)
+  policy bigint
 );
