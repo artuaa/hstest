@@ -7,26 +7,36 @@
             [spec :as spec]
             [clojure.test :refer :all]))
 
-(defn fix-insert-data [] (let [patients (->> (io/resource "seeds/patients.edn")
-                                            io/file
-                                            slurp
-                                            edn/read-string
-                                            :data
-                                            (map spec/confrom)
-                                            (map #(dissoc % :id)))]
-                           (jdbc/execute! db "truncate patients cascade;")
-                           (jdbc/insert-multi! db :patients patients)))
+(defn fix-insert-data [t] (let [patients (->> (io/resource "seeds/patients.edn")
+                                              io/file
+                                              slurp
+                                              edn/read-string
+                                              :data
+                                              (map spec/confrom)
+                                              (map #(dissoc % :id)))]
+                            (jdbc/execute! db "truncate patients cascade;")
+                            (jdbc/insert-multi! db :patients patients)
+                            (t)))
+
+(use-fixtures :each fix-insert-data)
 
 (deftest test-health
   (let [request {:request-method :get :uri "/health"}
         response (app request)
         {:keys [status body]} response] (is (= 200 status))))
 
+(def p {:name "piu piu"
+        :address "Mosocw"
+        :birthdate "2012-11-11"
+        :policy "1234123412341234"
+        :gender "male"})
+
 (deftest test-create-patient
-  (let [data {:name "hello"}
-        request {:request-method :post :uri "/api/patient" :body data}
+  (let [data p
+        request {:request-method :post :uri "/api/patient" :body {:patient data}}
         response (app request)
-        {:keys [status body]} response] (is (= 400 status))))
+        {:keys [status body]} response]
+    (is (= 200 status))))
 
 (comment
   (fix-insert-data)
