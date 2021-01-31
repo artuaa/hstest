@@ -1,8 +1,11 @@
 (ns ^:figwheel-hooks hs.main
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
+   [cljs-http.client :as http]
+   [spec :as spec]
+   [cljs.core.async :refer [<!]]
    [reagent.dom :as r.dom]
-   [reagent.core :as r]
-   [hs.http :as http]))
+   [reagent.core :as r]))
 
 (def route (r/atom {:path "patient" :id "f64d1806-35e0-42b6-b7ff-25f37576229c"}))
 
@@ -14,21 +17,26 @@
 
 (def patients (r/atom []))
 
-(defn get-patients [] (http/GET (get-url "/api/patients") #(reset! patients (:patients %))))
+(defn get-patients [] (go (let [resp (<! (http/get (get-url "/api/patients")))]
+                      (reset! patients (-> resp :body :patients)))))
 
 
 (get-patients)
 
-(defn delete-patient [id] (when (js/confirm "Delete patient?")
-                            (http/DELETE (str (get-url "/api/patient/") id)
-                              (fn [_] (swap! patients (fn [old] (remove (fn [v] (= (:id v) id)) old)))))))
+;; (defn delete-patient [id] (when (js/confirm "Delete patient?")
+;;                             (http/DELETE (str (get-url "/api/patient/") id)
+;;                               (fn [_] (swap! patients (fn [old] (remove (fn [v] (= (:id v) id)) old)))))))
 
-(defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} (fn [](js/alert "Patient saved")
-                                                                                          (open-main))))
+;; (defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} (fn [](js/alert "Patient saved")
+;;                                                                                           (open-main))))
 
-(defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
-                                                                                                            (open-main))))
+;; (defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
+                                                                                                            ;; (open-main))))
+(defn update-patient [patient] {})
 
+(defn delete-patient [id] {})
+
+(defn create-patient [patient] {})
 
 (defn patient-table []
   (fn []

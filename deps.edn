@@ -1,8 +1,9 @@
 {:paths
- ["src/clj" "src/cljs"  "resources", "target"]
+ ["src/clj" "src/cljc" "src/cljs"  "resources", "target"]
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.764"}
   reagent/reagent {:mvn/version "1.0.0"}
+  cljs-http/cljs-http {:mvn/version "0.1.46"}
   com.bhauman/figwheel-main {:mvn/version "0.2.11"}
   ring/ring-core {:mvn/version "1.8.2"}
   ring/ring-json {:mvn/version "0.5.0"}
