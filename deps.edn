@@ -11,7 +11,8 @@
   compojure/compojure {:mvn/version "1.6.1"}
   org.clojure/java.jdbc {:mvn/version "0.7.11"}
   org.postgresql/postgresql {:mvn/version "42.2.5"}
-  clj-time/clj-time {:mvn/version "0.15.2"}}
+  clj-time/clj-time {:mvn/version "0.15.2"}
+  healthsamurai/matcho {:mvn/version "0.3.7"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
                                                           :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}

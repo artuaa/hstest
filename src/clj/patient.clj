@@ -1,21 +1,12 @@
-
 (ns patient
   (:require [db.core :refer [db]]
             [clojure.spec.alpha :as s]
             [spec :as spec]
             [clojure.java.jdbc :as j]))
+(defn- parse-id [val]
+  (try (Integer/parseInt val)
+       (catch Exception e nil)))
 
-(def spec-errors {:patient "patient is invalid"
-                  :patient/name "name is invalid"
-                  :patient/gender "gender is invalid"
-                  :patient/birthdate "birthdate is invalid"
-                  :patient/address "address is invalid"
-                  :patient/policy "policy is invalid"})
-(defn get-message
-  [problem]
-  (let [{:keys [via]} problem]
-    (->> via first
-         (keep spec-errors) first)))
 
 (defn- get-patients [] (let [query "select * from patients"]
                          (j/query db query)))
@@ -23,17 +14,19 @@
 (defn get-many [req] {:status 200
                       :body {:patients (get-patients)}})
 
-(defn get-one-handler [req] (let [query ["select * from patients where id = ?" (get-in req [:params :id])]
+(defn get-one-handler [req] (let [id (-> req :params :id Integer/parseInt)
+                                  query ["select * from patients where id = ?" id]
                                   patient (first
                                            (j/query db query))]
                               (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
 
 (defn update-handler [req] (println req)
-  (let [id (get-in req [:params :id])
-        entity (dissoc (get-in req [:body :patient]) :id)
-        upd? (-> (j/update! db :patients entity ["id = ?" id])
-                 first zero? not)]
-    {:status 200 :body {:updated upd?}}))
+  (if-let [id (-> req :params :id parse-id)]
+    (let [entity (dissoc (get-in req [:body :patient]) :id)
+         upd? (-> (j/update! db :patients entity ["id = ?" id])
+                  first zero? not)]
+      {:status 200 :body {:updated upd?}}
+      {:status 400})))
 
 (defn create-handler [req] (println req)
   (let [entity (-> req :body :patient)
@@ -41,7 +34,8 @@
     (if ok? (do (j/insert! db :patients result)
                 {:status 200})  {:status 400})))
 
-(defn delete-handler [req] (let [count (first (j/delete! db :patients ["id = ?" (get-in req [:params :id])]))]
-                             (if (zero? count) {:status 404} {:status 200})))
+(defn delete-handler [req] ( if-let [id (-> req :params :id parse-id)](let [
+                                  count (first (j/delete! db :patients ["id = ?" id]))]
+                              (if (zero? count) {:status 404} {:status 200})) {:status 400}))
 (comment
   (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/patient/birthdate "1234") :name "hello"}))

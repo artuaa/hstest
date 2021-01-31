@@ -1,59 +1,26 @@
 (ns app-test
   (:require [app :refer [app]]
-            [db.core :as conn]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [spec :as spec]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all]
+            [funtest :as ft]))
 
-(def db* (assoc conn/db :dbname "db_test"))
+(deftest test-app
+  (ft/onreq {:status 200}
+            {:request-method :get :uri "/health"})
 
-(defn create-patients-table [] ((jdbc/execute! db* "drop table if exists ")
-                                (->> (io/resource "sql/create.sql")
-                                     io/file
-                                     slurp
-                                     (jdbc/execute! db*))))
+  (def p {:name "piu piu"
+          :address "Mosocw"
+          :birthdate "2012-11-11"
+          :policy "1234123412341234"
+          :gender "male"})
 
-(defn recreate-patients-table []
-  (let [query (-> (io/resource "sql/create.sql")
-                  io/file slurp
-                  (clojure.string/replace #"\n" " "))]
-    (jdbc/execute! db* "drop table if exists patients")
-    (jdbc/execute! db* query)))
+  (ft/onreq {:status 201}
+            {:request-method :post :uri "/api/patient" :body {:patient p}})
 
-(defn fix-insert-data [t] (let [patients (->> (io/resource "seeds/patients.edn")
-                                              io/file
-                                              slurp
-                                              edn/read-string
-                                              :data
-                                              (map spec/confrom)
-                                              (map #(dissoc % :id)))]
-                            (recreate-patients-table)
-                            (jdbc/insert-multi! db* :patients patients)
-                            (t)))
+  (ft/onreq {:status 200}
+            {:request-method :get :uri "/api/patients" :body {:patient p}})
 
-(use-fixtures :each fix-insert-data)
+  (ft/onreq {:status 404}
+            {:request-method :delete :uri "/api/patient/0"})
 
-(deftest test-health
-  (let [request {:request-method :get :uri "/health"}
-        response (app request)
-        {:keys [status body]} response] (is (= 200 status))))
-
-(def p {:name "piu piu"
-        :address "Mosocw"
-        :birthdate "2012-11-11"
-        :policy "1234123412341234"
-        :gender "male"})
-
-(deftest test-create-patient
-  (let [data p
-        request {:request-method :post :uri "/api/patient" :body {:patient data}}
-        response (app request)
-        {:keys [status body]} response]
-    (is (= 200 status))))
-
-(comment
-  (fix-insert-data)
-  (jdbc/execute! db* "truncate patients cascade;")
-  (jdbc/execute! db* "select count(*) from patients"))
+  (ft/onreq {:status 400}
+            {:request-method :delete :uri "/api/patient/badid"}))
