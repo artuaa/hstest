@@ -14,12 +14,10 @@
 
 (defn get-url [path] (str "http://localhost:8080" path))
 
-
 (def patients (r/atom []))
 
 (defn get-patients [] (go (let [resp (<! (http/get (get-url "/api/patients")))]
-                      (reset! patients (-> resp :body :patients)))))
-
+                            (reset! patients (-> resp :body :patients)))))
 
 (get-patients)
 
@@ -30,9 +28,11 @@
 ;; (defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} (fn [](js/alert "Patient saved")
 ;;                                                                                           (open-main))))
 
-;; (defn update-patient [patient] (http/PUT (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
+(defn update-patient [] (go (let [resp (<! (http/put (get-url "/api/patient")))]
+                              (js/alert "Patient updated"))))
+
+;; (defn update-patient [patient] (http/put (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
                                                                                                             ;; (open-main))))
-(defn update-patient [patient] {})
 
 (defn delete-patient [id] {})
 
@@ -54,10 +54,13 @@
                        [:button {:on-click #(delete-patient (:id item))} "Delete"]]])
                    @patients)]]]))
 
-
 (defn patient-form [p]
   (let [patient (r/atom p)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
+        submit (fn [e] (let [data (s/conform :hs.spec/patient @patient)
+                         valid? (not= :clojure.spec.alpha/invalid)]
+                     (.preventDefault %)
+                     (if valid? (update-patient data) (js/alert "Data is invalid"))))
     (fn []
       (if (nil? patient) [:span "loading"]
           [:form.form
@@ -73,42 +76,36 @@
            [:input {:id "Address" :placeholder "Address" :on-change (change :address) :value (:address @patient)}]
            [:label {:for "Policy"} "Policy"]
            [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
-           [:button {:on-click #(do (.preventDefault %)
-                                    (update-patient @patient))} "Save"]]))))
+           [:button {:on-click submit} "Save"]]))))
 
 (defn patient-page []
   (fn [] (if (empty? @patients) [:span "Loading"] (patient-form (first (filter #(= (:id %) (:id @route)) @patients))))))
 
 (defn app []
   (let [path (:path @route)]
-    (fn [](cond
-          (= path "patient") patient-page
-           :else patient-table))))
+    (fn [] (cond
+             (= path "patient") patient-page
+             :else patient-table))))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))
 
-
 (defn ^:after-load re-render []
   (mount))
-
 
 (defonce start-up (do (mount) true))
 
 (comment
   (deref patients)
   (deref route)
-         (update-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
-                          :name "My update"
-                          :birthdate nil
-                          :address "Adler, Mira 13"
-                          :gender "male"
-                          :policy "number"
-                          })
-         (create-patient {:name "Alex Alex"
-                          :birthdate nil
-                          :address "Adler, Mira 13"
-                          :gender "male"
-                          :policy "number"
-                          })
-         )
+  (update-patient {:id "1c0ba9ac-fcc5-49ef-9279-92dec722f3ce"
+                   :name "My update"
+                   :birthdate nil
+                   :address "Adler, Mira 13"
+                   :gender "male"
+                   :policy "number"})
+  (create-patient {:name "Alex Alex"
+                   :birthdate nil
+                   :address "Adler, Mira 13"
+                   :gender "male"
+                   :policy "number"}))
