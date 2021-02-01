@@ -1,5 +1,6 @@
 (ns hs.spec
   (:require [clojure.spec.alpha :as s]
+            [hs.spec-base]
             [clojure.instant :refer [read-instant-date]]))
 
 (s/def ::->date

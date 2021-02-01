@@ -2,6 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
    [cljs-http.client :as http]
+   [hs.spec]
    [clojure.spec.alpha :as s]
    [cljs.core.async :refer [<!]]
    [reagent.dom :as r.dom]
@@ -28,7 +29,7 @@
 ;; (defn create-patient [patient] (http/POST (get-url "/api/patient") {:patient patient} (fn [](js/alert "Patient saved")
 ;;                                                                                           (open-main))))
 
-(defn update-patient [] (go (let [resp (<! (http/put (get-url "/api/patient")))]
+(defn update-patient [patient] (go (let [resp (<! (http/put (get-url "/api/patient") {:body {:patient patient}}))]
                               (js/alert "Patient updated"))))
 
 ;; (defn update-patient [patient] (http/put (str (get-url "/api/patient/") (:id patient)) {:patient patient} (fn [](js/alert "Patient updated")
@@ -56,11 +57,14 @@
 
 (defn patient-form [p]
   (let [patient (r/atom p)
-        change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
-        submit (fn [e] (let [data (s/conform :hs.spec/patient @patient)
-                         valid? (not= :clojure.spec.alpha/invalid)]
-                     (.preventDefault %)
-                     (if valid? (update-patient data) (js/alert "Data is invalid"))))
+        change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))
+        submit (fn [e] (.preventDefault e)
+                 (let [data (s/conform :hs.spec/patient @patient)
+                         valid? (not= :cljs.spec.alpha/invalid data)]
+                   (js/console.log data)
+                   (if valid? (update-patient data)
+                       (do (js/console.log (clj->js (s/explain-data :hs.spec/patient @patient)))
+                           (js/alert "Data is invalid")))))]
     (fn []
       (if (nil? patient) [:span "loading"]
           [:form.form
