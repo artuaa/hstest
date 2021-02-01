@@ -6,7 +6,7 @@
              [clojure.edn :as edn]
              [matcho.core :as m]
              [clojure.java.io :as io]
-             [spec :as spec]))
+             [clojure.spec.alpha :as s]))
 
 (defn onreq [exp req]
   (m/assert exp (app req)))
@@ -34,13 +34,14 @@
                                               slurp
                                               edn/read-string
                                               :data
-                                              (map spec/confrom)
+                                              ;; (map spec/confrom)
                                               (map #(dissoc % :id)))]
                             (recreate-patients-table)
                             (jdbc/insert-multi! db* :patients patients)
                             (t)))
 
 (comment
+  (s/valid? :hs.spec/patient {})
   (fix-insert-data)
   (jdbc/execute! db* "truncate patients cascade;")
   (jdbc/execute! db* "select count(*) from patients"))

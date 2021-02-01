@@ -1,4 +1,4 @@
-(ns spec
+(ns hs.spec
   (:require [clojure.spec.alpha :as s]))
 
 (s/def ::->date
@@ -19,13 +19,6 @@
                    :patient/gender
                    :patient/policy]
           :opt-un [:patient/id]))
-
-(defn validate [val] (let [result (s/conform ::patient val)]
-                       (if (= result :clojure.spec.alpha/invalid)
-                         [false (s/explain-data ::patient val)]
-                         [true result])))
-
-(defn confrom [p] (s/conform ::patient p))
 
 (comment
   (s/conform ::->date "2000")

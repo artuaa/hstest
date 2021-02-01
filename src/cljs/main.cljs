@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
    [cljs-http.client :as http]
-   [spec :as spec]
+   [clojure.spec.alpha :as s]
    [cljs.core.async :refer [<!]]
    [reagent.dom :as r.dom]
    [reagent.core :as r]))

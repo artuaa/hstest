@@ -1,4 +1,4 @@
-(ns spec-base
+(ns hs.spec-base
   (:require [clojure.spec.alpha :as s]))
 
 
