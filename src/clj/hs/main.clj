@@ -8,9 +8,8 @@
 (defn start []
   (let [port 8080]
     (println (str "Server started: " port))
-    (reset! atom (adapter/run-jetty #'app {:port port}))))
+    (reset! atom (adapter/run-jetty #'app {:port port :join? false}))))
 
 (defn stop [] (@server))
-
 (defn -main [& args]
   (start))

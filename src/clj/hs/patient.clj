@@ -2,6 +2,7 @@
   (:require [hs.db.core :refer [db]]
             [hs.spec :as hss]
             [clojure.spec.alpha :as s]
+            [clojure.data.json :as json]
             [clojure.java.jdbc :as j]))
 
 (defn- parse-id [val]
@@ -31,10 +32,12 @@
 
 (defn create-handler [req] (println req)
   (let [entity (-> req :body :patient)
-        [ok? result] [true true];;(spec/validate entity)
-        ]
-    (if ok? (do (j/insert! db :patients result)
-                {:status 200})  {:status 400})))
+        result (s/conform ::hss/patient entity)
+        ok (not= result ::s/invalid)]
+    (print result)
+    (if ok (do (j/insert! db :patients result)
+               {:status 200})  {:status 400
+                                :body (json/write-str (s/explain-data ::hss/patient entity))})))
 
 (defn delete-handler [req] (if-let [id (-> req :params :id parse-id)] (let [count (first (j/delete! db :patients ["id = ?" id]))]
                                                                         (if (zero? count) {:status 404} {:status 200})) {:status 400}))

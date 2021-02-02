@@ -1,13 +1,13 @@
 (ns hs.spec
   (:require [clojure.spec.alpha :as s]
-            [hs.spec-base]
+            [hs.spec-base :as b]
             [clojure.instant :refer [read-instant-date]]))
 
 (s/def ::->date
   (s/conformer
    (fn [value]
      (try
-       (-> (read-instant-date "2012")
+       (-> (read-instant-date value)
            (.getTime)
            (java.time.Instant/ofEpochMilli)
            (.atZone (java.time.ZoneId/of "UTC"))
@@ -16,7 +16,7 @@
          ::s/invalid)))))
 
 (s/def :patient/birthdate (s/and
-                           ::ne-string
+                           ::b/ne-string
                            ::->date))
 
 (s/def ::patient
