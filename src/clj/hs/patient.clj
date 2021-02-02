@@ -1,7 +1,9 @@
-(ns patient
-  (:require [db.core :refer [db]]
+(ns hs.patient
+  (:require [hs.db.core :refer [db]]
+            [hs.spec :as hss]
             [clojure.spec.alpha :as s]
             [clojure.java.jdbc :as j]))
+
 (defn- parse-id [val]
   (try (Integer/parseInt val)
        (catch Exception e nil)))
@@ -22,8 +24,8 @@
 (defn update-handler [req] (println req)
   (if-let [id (-> req :params :id parse-id)]
     (let [entity (dissoc (get-in req [:body :patient]) :id)
-         upd? (-> (j/update! db :patients entity ["id = ?" id])
-                  first zero? not)]
+          upd? (-> (j/update! db :patients entity ["id = ?" id])
+                   first zero? not)]
       {:status 200 :body {:updated upd?}}
       {:status 400})))
 
@@ -34,8 +36,7 @@
     (if ok? (do (j/insert! db :patients result)
                 {:status 200})  {:status 400})))
 
-(defn delete-handler [req] ( if-let [id (-> req :params :id parse-id)](let [
-                                  count (first (j/delete! db :patients ["id = ?" id]))]
-                              (if (zero? count) {:status 404} {:status 200})) {:status 400}))
+(defn delete-handler [req] (if-let [id (-> req :params :id parse-id)] (let [count (first (j/delete! db :patients ["id = ?" id]))]
+                                                                        (if (zero? count) {:status 404} {:status 200})) {:status 400}))
 (comment
-  (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/patient/birthdate "1234") :name "hello"}))
+  (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/birthdate "1234") :name "hello"}))

@@ -1,6 +1,6 @@
-(ns main
+(ns hs.main
   (:require [ring.adapter.jetty :as adapter]
-            [app :refer [app]])
+            [hs.app :refer [app]])
   (:gen-class))
 
 (def server (atom nil))

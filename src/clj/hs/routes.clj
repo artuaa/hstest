@@ -1,7 +1,7 @@
-(ns routes
+(ns hs.routes
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [patient :as patient]
+            [hs.patient :as patient]
             [clojure.java.io :as io]))
 
 (defn index-handler [req] {:status 200

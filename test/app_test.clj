@@ -1,5 +1,5 @@
 (ns app-test
-  (:require [app :refer [app]]
+  (:require [hs.app :refer [app]]
             [clojure.test :refer :all]
             [funtest :as ft]))
 

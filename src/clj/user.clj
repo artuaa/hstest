@@ -1,5 +1,5 @@
 (ns user
-   (:require [main :as m]))
+  (:require [hs.main :as m]))
 
 (defn start-server
   []

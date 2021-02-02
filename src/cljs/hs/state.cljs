@@ -33,6 +33,6 @@
 (defn create-patient
   [patient] (go (let [[status body]
                       (<! (http/post (get-url "/api/patient")
-                                     {:body {:patient patient}
+                                     {:json-params {:patient patient}
                                       :with-credentials? false}))]
                   {:ok (< status 300)})))

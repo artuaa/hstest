@@ -1,4 +1,4 @@
-(ns db.core)
+(ns hs.db.core)
 
 (def db  {:dbtype "postgresql"
           :dbname "db_dev"

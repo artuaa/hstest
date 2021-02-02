@@ -1,7 +1,7 @@
 (ns funtest
   (:require  [clojure.test :as t]
-             [app :refer [app]]
-             [db.core :as conn]
+             [hs.app :refer [app]]
+             [hs.db.core :as conn]
              [clojure.java.jdbc :as jdbc]
              [clojure.edn :as edn]
              [matcho.core :as m]
@@ -42,6 +42,6 @@
 
 (comment
   (s/valid? :hs.spec/patient {})
-  (fix-insert-data)
+  ;; (fix-insert-data)
   (jdbc/execute! db* "truncate patients cascade;")
   (jdbc/execute! db* "select count(*) from patients"))

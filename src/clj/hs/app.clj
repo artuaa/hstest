@@ -1,11 +1,11 @@
 
-(ns app
+(ns hs.app
   (:require [ring.middleware.json :refer [wrap-json-body
                                           wrap-json-response]]
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.cors :refer [wrap-cors]]
             [ring.logger :refer [wrap-with-logger]]
-            [routes :as r]))
+            [hs.routes :as r]))
 
 (def app
   "Main Ring handler for the application"

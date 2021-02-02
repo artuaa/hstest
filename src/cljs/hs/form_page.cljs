@@ -4,7 +4,6 @@
    [hs.state :as st]
    [reagent.core :as r]))
 
-(st/create-patient)
 
 (defn- validate [p]
   (let [result (s/conform :hs.spec/patient p)]
@@ -13,7 +12,7 @@
       [false (s/explain-data :hs.spec/patient p)]
       [true result])))
 
-(defn- create [p](let [{ok :ok} (st/create-patient)]
+(defn- create [p](let [{ok :ok} (st/create-patient p)]
                    (when (not ok) (js/alert "Create error"))))
 
 (defn- submit [p]

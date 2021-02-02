@@ -2,7 +2,7 @@
    (:require [clojure.java.io :as io]
              [clojure.java.jdbc :as jdbc]
              [clojure.edn :as edn]
-             [db.core :refer [db]]))
+             [hs.db.core :refer [db]]))
 
 (defn insert-seed!
   "Inserts a single seed definition into the database."
