@@ -12,15 +12,15 @@
       [false (s/explain-data :hs.spec/patient p)]
       [true result])))
 
-(defn- create [p](let [{ok :ok} (st/create-patient p)]
-                   (when (not ok) (js/alert "Create error"))))
+(defn- create [p] (let [{ok :ok} (st/create-patient p)]
+                    (when (not ok) (js/alert "Create error"))))
 
 (defn- submit [p]
   (js/console.log "submit")
   (let [[ok result] (validate p)]
     (if ok (create p)
         (do (js/console.log (clj->js result))
-          (js/alert "Data is invalid")))))
+            (js/alert "Data is invalid")))))
 
 (defn- form [p]
   (let [initial {:name ""
@@ -45,7 +45,7 @@
        [:label {:for "Policy"} "Policy"]
        [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
        [:button {:on-click (fn [e]
-                              (.preventDefault e)
+                             (.preventDefault e)
                              (submit @patient))} "Save"]])))
 
 (defn page [] (form nil))
