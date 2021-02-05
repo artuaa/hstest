@@ -9,11 +9,16 @@
 
 (defn get-url [path] (str "http://localhost:8080" path))
 
-(def patients (r/atom []))
+(def state (r/atom {:patients []}))
 
-(defn get-patients [] (go (let [[status body] (<! (http/get (get-url "/api/patients") {:with-credentials? false}))]
-                            (reset! patients (-> body :patients))
-                            {:ok (< status 300)})))
+(defn get-patients [] (go (let [{:keys [status body]} (<! (http/get (get-url "/api/patients") {:with-credentials? false}))]
+                            (swap! state assoc :patients (-> body :patients))
+                            {:ok (< (:status status) 300)})))
+(comment
+  @state
+  (swap! state assoc :patients [123])
+  (get-patients)
+  )
 
 ;; (defn delete-patient [id] (when (js/confirm "delete patient?")
 ;;                             (http/delete (str (get-url "/api/patient/") id)

@@ -2,25 +2,42 @@
   (:require
    [hs.form-page :as form]
    [reagent.dom :as r.dom]
+   [hs.state :as state]
    [reagent.session :as session]
-   [hs.list-page :as table]
    [accountant.core :as accountant]
    [bidi.bidi :as bidi]
    [reagent.core :as r]))
+
+(comment
+  (session/get :route)
+  (bidi/match-route app-routes :index))
 
 (def app-routes
   ["/" {"" :index
         "patient/" {"" :form
                     [:id] :form}}])
 
-(def handlers {:index (fn [] [:div "hello"])
+(defn table [](state/get-patients) (fn []
+    [:div [:h1 "Patients"]
+     [:table
+      [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
+      [:tbody (map (fn [item]
+                     [:tr {:key (:id item)}
+                      [:td [:a {:href "heloo"} (:name item)]]
+                      [:td (:gender item)]
+                      [:td (:birthday item)]
+                      [:td (:address item)]
+                      [:td (:policy item)]
+                      [:td [:a {:href (bidi/path-for app-routes :form)} "edit"]
+                       [:button {:on-click #(delete-patient (:id item))} "Delete"]]])
+                   (:patients @state/state))]]]))
+
+(def handlers {:index table
                :form form/page})
+
 (defn render-route [key] (if-let [m (get handlers key)]
-                           (m)
+                          [m]
                            [:div "page not found"]))
-(comment
-  (session/get :route)
-  (bidi/match-route app-routes :index))
 
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
