@@ -18,8 +18,9 @@
                     [:id] :form}}])
 (defmulti page-contents identity)
 
+(state/get-patients)
+
 (defmethod page-contents :index []
-  (state/get-patients)
     [:div [:h1 "Patients"]
      [:table
       [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
