@@ -17,7 +17,9 @@
         "patient/" {"" :form
                     [:id] :form}}])
 
-(defn table [](state/get-patients) (fn []
+(defn table []
+  (state/get-patients)
+  (fn []
     [:div [:h1 "Patients"]
      [:table
       [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
@@ -36,7 +38,7 @@
                :form form/page})
 
 (defn render-route [key] (if-let [m (get handlers key)]
-                          [m]
+                           [m]
                            [:div "page not found"]))
 
 (defn app []
