@@ -16,10 +16,10 @@
   ["/" {"" :index
         "patient/" {"" :form
                     [:id] :form}}])
+(defmulti page-contents identity)
 
-(defn table []
+(defmethod page-contents :index []
   (state/get-patients)
-  (fn []
     [:div [:h1 "Patients"]
      [:table
       [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
@@ -31,19 +31,18 @@
                       [:td (:address item)]
                       [:td (:policy item)]
                       [:td [:a {:href (bidi/path-for app-routes :form)} "edit"]
-                       [:button {:on-click #(delete-patient (:id item))} "Delete"]]])
-                   (:patients @state/state))]]]))
+                       [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
+                   (:patients @state/state))]]])
 
-(def handlers {:index table
-               :form form/page})
+(defmethod page-contents :form [] [:div "form"])
 
-(defn render-route [key] (if-let [m (get handlers key)]
-                           [m]
-                           [:div "page not found"]))
+(defmethod page-contents :default [] [:div "hell    o"])
 
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
-           [:div (render-route route)])))
+          [:div [:div [:a {:href (bidi/path-for app-routes :index)} "HOME"]
+                 [:a {:href (bidi/path-for app-routes :form)} "CREATE"]]
+           (page-contents route)])))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))
