@@ -5,44 +5,41 @@
    [reagent.session :as session]
    [accountant.core :as accountant]
    [bidi.bidi :as bidi]
+   [hs.spec]
    [reagent.core :as r]))
 
 (comment
   (session/get :route)
   (bidi/match-route app-routes "/patient/123")
-  (bidi/path-for app-routes :update :id 13))
+  (bidi/path-for app-routes :update :id 13)
+  (->> @state/state :patients (filter #(= (:id %) 360)) first)
+  )
 
 (def app-routes
   ["/" {"" :index
         "patient" {"" :create
-                    ["/" :id] :update}}])
+                   ["/" :id] :update}}])
 
 (defmulti page-contents identity)
 
-
 (defmethod page-contents :index []
   (state/get-patients)
-   (fn [] [:div [:h1 "Patients"]
-            [:table
-             [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
-             [:tbody (map (fn [item]
-                            [:tr {:key (:id item)}
-                             [:td [:a {:href "heloo"} (:name item)]]
-                             [:td (:gender item)]
-                             [:td (:birthday item)]
-                             [:td (:address item)]
-                             [:td (:policy item)]
-                             [:td [:a {:href (bidi/path-for app-routes :update :id (:id item))} "edit"]
-                              [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
-                          (:patients @state/state))]]]))
+  (fn [] [:div [:h1 "Patients"]
+          [:table
+           [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
+           [:tbody (map (fn [item]
+                          [:tr {:key (:id item)}
+                           [:td [:a {:href "heloo"} (:name item)]]
+                           [:td (:gender item)]
+                           [:td (:birthday item)]
+                           [:td (:address item)]
+                           [:td (:policy item)]
+                           [:td [:a {:href (bidi/path-for app-routes :update :id (:id item))} "edit"]
+                            [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
+                        (:patients @state/state))]]]))
 
-(defmethod page-contents :update []
-  (let [initial {:name ""
-                 :birthdate nil
-                 :gender "male"
-                 :policy ""
-                 :address ""}
-        patient (r/atom initial)
+(defn  form [initial]
+  (let [patient (r/atom initial)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
     (fn []
       [:form.form
@@ -61,15 +58,29 @@
        [:button {:on-click (fn [e]
                              (.preventDefault e)
                              ;; (submit @patient)
-                             )} "Save"]])))
+                             )}"Save"]])))
+
+(defmethod page-contents :create []
+  (let [initial {:name ""
+                 :birthdate nil
+                 :gender "male"
+                 :policy ""
+                 :address ""}]
+    [form initial]))
+
+(defmethod page-contents :update []
+  (let [id (-> (session/get :route) :route-params :id js/parseInt)
+        initial (->> @state/state :patients (filter #(= (:id %) id)) first)]
+  (js/console.log initial)
+  [form initial]))
 
 (defmethod page-contents :default [] [:div "hello"])
 
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
-          [:div [:div [:a {:href (bidi/path-for app-routes :index)} "HOME"]
-                 [:a {:href (bidi/path-for app-routes :form)} "CREATE"]]
-          ^{:key route} [page-contents route]])))
+           [:div [:div [:a {:href (bidi/path-for app-routes :index)} "HOME"]
+                  [:a {:href (bidi/path-for app-routes :create)} "CREATE"]]
+            ^{:key route} [page-contents route]])))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))
