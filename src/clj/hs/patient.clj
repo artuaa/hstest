@@ -9,7 +9,6 @@
   (try (Integer/parseInt val)
        (catch Exception e nil)))
 
-
 (defn- get-patients [] (let [query "select * from patients"]
                          (j/query db query)))
 
@@ -21,14 +20,50 @@
                                   patient (first
                                            (j/query db query))]
                               (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
+(defn wrap-id [handler]
+  (fn [req]
+    (if-let [id (-> req :params :id parse-id)]
+      (handler (assoc-in req [:params :id] id))
+      {:status 400 :body {:error_message "id is invalid"}})))
 
-(defn update-handler [req] (println req)
-  (if-let [id (-> req :params :id parse-id)]
-    (let [entity (dissoc (get-in req [:body :patient]) :id)
-          upd? (-> (j/update! db :patients entity ["id = ?" id])
-                   first zero? not)]
-      {:status 200 :body {:updated upd?}}
-      {:status 400})))
+(defn wrap-patient [handler]
+  (fn [req] (let [entity (-> req :body :patient)
+                  conformed (s/conform :hs.spec/patient entity)]
+              (if (not= conformed ::s/invalid)
+                (handler (assoc-in req [:body :patient] conformed))
+                {:status 400
+                 :body {:error_message "patient is invalid"
+                        :error (s/explain-data :hs.spec/patient entity)}}))))
+
+(defn update-patient [req]
+  (let [id (-> req :params :id)
+        patient (-> req :body :patient)
+        updated (-> (j/update! db :patients patient ["id = ?" id])
+                    first zero? not)]
+    (if (zero? updated)
+      {:status 404
+       :error_message "patient not found"}
+      {:status 200})))
+
+(def update-handler (-> update-patient wrap-patient wrap-id))
+
+(comment
+  (update-handler {:params {:id "13"}})
+  (def patient {:name "hello"
+                :gender "female"
+                :address "hlelo"
+                :policy "1234123412341234"
+                :birthdate "2012-01-01"})
+  (update-handler {:params {:id "13"} :body {:patient patient}}))
+;; (defn update-handler [req] (println req)
+;;   (if-let [id (-> req :params :id parse-id)]
+;;     (let [entity (dissoc (get-in req [:body :patient]) :id)
+;;           conformed (s/conform :hs.spec/patient entity)]
+;;       (if (= conformed ::s/invalid) {:status 400}
+;;           (let [updated (-> (j/update! db :patients entity ["id = ?" id])
+;;                    first zero? not)]))
+;;       {:status 200 }
+;;       {:status 400})))
 
 (defn create-handler [req] (println req)
   (let [entity (-> req :body :patient)
