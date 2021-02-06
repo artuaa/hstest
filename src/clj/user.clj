@@ -3,4 +3,4 @@
 
 (defn start-server
   []
-  (m/-main))
+  (m/start))
