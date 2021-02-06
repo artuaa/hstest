@@ -14,7 +14,7 @@
 
 
 (def routes
-  ["" {"/" {:get #'index-handler}
+  [{"/" {:get #'index-handler}
                      "/health" {:get #'health}
                      "/api" {"/patients" {:get #'patient/get-many}
                              ["/patient/" :id] {:post #'patient/create-handler
