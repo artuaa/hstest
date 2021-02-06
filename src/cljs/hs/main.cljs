@@ -9,12 +9,14 @@
 
 (comment
   (session/get :route)
-  (bidi/match-route app-routes :index))
+  (bidi/match-route app-routes "/patient/123")
+  (bidi/path-for app-routes :update :id 13))
 
 (def app-routes
   ["/" {"" :index
-        "patient/" {"" :form
-                    [:id] :form}}])
+        "patient" {"" :create
+                    ["/" :id] :update}}])
+
 (defmulti page-contents identity)
 
 
@@ -30,11 +32,11 @@
                              [:td (:birthday item)]
                              [:td (:address item)]
                              [:td (:policy item)]
-                             [:td [:a {:href (bidi/path-for app-routes :form)} "edit"]
+                             [:td [:a {:href (bidi/path-for app-routes :update :id (:id item))} "edit"]
                               [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
                           (:patients @state/state))]]]))
 
-(defmethod page-contents :form []
+(defmethod page-contents :update []
   (let [initial {:name ""
                  :birthdate nil
                  :gender "male"
