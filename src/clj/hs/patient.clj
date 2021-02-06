@@ -15,7 +15,8 @@
 (defn get-many [req] {:status 200
                       :body {:patients (get-patients)}})
 
-(defn get-one-handler [req] (let [id (-> req :params :id Integer/parseInt)
+(defn get-one-handler [req]
+   (let [id (-> req :params :id Integer/parseInt)
                                   query ["select * from patients where id = ?" id]
                                   patient (first
                                            (j/query db query))]
@@ -28,14 +29,14 @@
 
 (defn wrap-patient [handler]
   (fn [req] (let [entity (-> req :body :patient)
-                  conformed (s/conform :hs.spec/patient entity)]
+                  conformed (s/conform :hs.spec/patient (dissoc entity :id))]
               (if (not= conformed ::s/invalid)
                 (handler (assoc-in req [:body :patient] conformed))
                 {:status 400
                  :body {:error_message "patient is invalid"
                         :error (s/explain-data :hs.spec/patient entity)}}))))
 
-(defn update-patient [req]
+(defn- update-patient [req]
   (let [id (-> req :params :id)
         patient (-> req :body :patient)
         updated (-> (j/update! db :patients patient ["id = ?" id])
@@ -55,26 +56,22 @@
                 :policy "1234123412341234"
                 :birthdate "2012-01-01"})
   (update-handler {:params {:id "13"} :body {:patient patient}}))
-;; (defn update-handler [req] (println req)
-;;   (if-let [id (-> req :params :id parse-id)]
-;;     (let [entity (dissoc (get-in req [:body :patient]) :id)
-;;           conformed (s/conform :hs.spec/patient entity)]
-;;       (if (= conformed ::s/invalid) {:status 400}
-;;           (let [updated (-> (j/update! db :patients entity ["id = ?" id])
-;;                    first zero? not)]))
-;;       {:status 200 }
-;;       {:status 400})))
 
-(defn create-handler [req] (println req)
-  (let [entity (-> req :body :patient)
-        result (s/conform ::hss/patient entity)
-        ok (not= result ::s/invalid)]
-    (print result)
-    (if ok (do (j/insert! db :patients result)
-               {:status 200})  {:status 400
-                                :body (json/write-str (s/explain-data ::hss/patient entity))})))
+(defn create-patient [req]
+  (let [patient (-> req :body :patient)]
+    (j/insert! db :patients patient)
+    {:status 200}))
 
-(defn delete-handler [req] (if-let [id (-> req :params :id parse-id)] (let [count (first (j/delete! db :patients ["id = ?" id]))]
-                                                                        (if (zero? count) {:status 404} {:status 200})) {:status 400}))
+(def create-handler (-> create-patient wrap-patient))
+
+(defn delete-patient [req]
+  (let [id (-> req :params :id)
+        deleted (->(j/delete! db :patients ["id = ?" id]) first zero? not)]
+      (if deleted {:status 200}
+          {:status 404
+           :body {:error_message "patient not found"}})))
+
+(def delete-handler (-> delete-patient wrap-id))
+
 (comment
   (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/birthdate "1234") :name "hello"}))
