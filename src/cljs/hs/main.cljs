@@ -6,6 +6,7 @@
    [accountant.core :as accountant]
    [bidi.bidi :as bidi]
    [hs.spec]
+   [clojure.spec.alpha :as s]
    [reagent.core :as r]))
 
 (comment
@@ -38,7 +39,7 @@
                             [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
                         (:patients @state/state))]]]))
 
-(defn  form [initial]
+(defn  form [initial submit-fn]
   (let [patient (r/atom initial)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
     (fn []
@@ -57,7 +58,7 @@
        [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
        [:button {:on-click (fn [e]
                              (.preventDefault e)
-                             ;; (submit @patient)
+                             (submit-fn @patient)
                              )}"Save"]])))
 
 (defmethod page-contents :create []
@@ -66,13 +67,19 @@
                  :gender "male"
                  :policy ""
                  :address ""}]
-    [form initial]))
+    [form initial #()]))
+
+(defn update-patient [v] (let [conformed (s/conform :hs.spec/patient v)]
+                   (if (= conformed ::s/invalid)
+                     (js/alert "Data is invalid")
+                     (state/update-patient conformed))))
 
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         initial (->> @state/state :patients (filter #(= (:id %) id)) first)]
+
   (js/console.log initial)
-  [form initial]))
+  [form initial update-patient]))
 
 (defmethod page-contents :default [] [:div "hello"])
 
