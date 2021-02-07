@@ -8,19 +8,6 @@
   (try (Integer/parseInt val)
        (catch Exception e nil)))
 
-(defn get-many [{req :request db :db}]
-  (let [query "select * from patients"
-        patients (j/query db query)]
-    {:status 200
-     :body {:patients patients}}))
-
-(defn get-one-handler [{req :request db :db}]
-  (let [id (-> req :params :id Integer/parseInt)
-        query ["select * from patients where id = ?" id]
-        patient (first
-                 (j/query db query))]
-    (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
-
 (defn wrap-id [handler]
   (fn [{req :request :as ctx}]
     (print (:route-params req))
@@ -38,6 +25,19 @@
          :body {:error_message "patient is invalid"
                 :error (s/explain-data :hs.spec/patient entity)}}))))
 
+(defn get-many [{req :request db :db}]
+  (let [query "select * from patients"
+        patients (j/query db query)]
+    {:status 200
+     :body {:patients patients}}))
+
+(defn get-one-handler [{req :request db :db}]
+  (let [id (-> req :params :id Integer/parseInt)
+        query ["select * from patients where id = ?" id]
+        patient (first
+                 (j/query db query))]
+    (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
+
 (defn- update-patient [{req :request db :db}]
   (let [id (-> req :params :id)
         patient (-> req :body :patient)
@@ -49,15 +49,6 @@
       {:status 200})))
 
 (def update-handler (-> update-patient wrap-patient wrap-id))
-
-(comment
-  (update-handler {:params {:id "13"}})
-  (def patient {:name "hello"
-                :gender "female"
-                :address "hlelo"
-                :policy "1234123412341234"
-                :birthdate "2012-01-01"})
-  (update-handler {:params {:id "13"} :body {:patient patient}}))
 
 (defn create-patient [{req :request db :db}]
   (let [patient (-> req :body :patient)]
@@ -79,4 +70,15 @@
   (-> (j/update! db :patients {:name "hello"} ["id = ?" 340])
       first
       zero?)
+
   (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/birthdate "1234") :name "hello"}))
+
+(update-handler {:params {:id "13"}})
+
+(def patient {:name "hello"
+              :gender "female"
+              :address "hlelo"
+              :policy "1234123412341234"
+              :birthdate "2012-01-01"})
+
+(update-handler {:params {:id "13"} :body {:patient patient}})
