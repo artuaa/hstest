@@ -2,41 +2,72 @@
   (:require [hs.main :as sut]
             [clojure.test :refer :all]
             [matcho.core :as m]
-            ;; [funtest :as ft]
-            ))
+            [clojure.java.jdbc :as jdbc]
+            [clojure.spec.alpha :as s]
+            [clojure.java.io :as io]))
 
-(deftest test-app
-  (def ctx (sut/start {:db {:dbname "db_test"}}))
-  (def handler (:handler @ctx))
+;; (defn init-db [db] (jdbc/execute! db "drop table if exists patients;"))
+                    ;; (->> (io/resource "sql/create.sql")
+                    ;;      io/file
+                    ;;      slurp
+                    ;;      (jdbc/execute! db))
 
-  (defn match [req exp]
-    (let [resp (handler req)]
-      (m/match resp exp)
-      resp))
+(def ctx (sut/start {:db {:dbname  "db_test"}}))
+  ;; (init-db (:db @ctx))
+(def handler (:handler @ctx))
 
+(defn match [req exp]
+  (let [resp (handler req)]
+    (m/match resp exp)
+    resp))
+
+(def p {:name "piu piu"
+        :address "Mosocw"
+        :birthdate "2012-11-10"
+        :policy "1234123412341234"
+        :gender "male"})
+
+(deftest test-cud
   (match
    {:request-method :get
     :uri "/health"}
-   {:status 200})
+    {:status 200})
 
-  (def p {:name "piu piu"
-          :address "Mosocw"
-          :birthdate "2012-11-11"
-          :policy "1234123412341234"
-          :gender "male"})
+  (def create-resp (match {:request-method :post
+                           :uri "/api/patient"
+                           :body {:patient p}}
+                     {:status 201 :body {:id int?}}))
 
-  (match {:request-method :post
-          :uri "/api/patient"
-          :body {:patient p}}
-         {:status 201 :body {:id int?}})
+  (def created-id (-> create-resp :body :id))
 
-  ;; (ft/onreq {:status 200}
-  ;;           {:request-method :get :uri "/api/patients" :body {:patient p}})
+  (match
+   {:request-method :put
+    :uri (format "/api/patient/%s" created-id)
+    :body {:patient p}}
+    {:status 200})
 
-  ;; (ft/onreq {:status 404}
-  ;;           {:request-method :delete :uri "/api/patient/0"})
+  (match
+   {:request-method :get
+    :uri (format "/api/patient/%s" created-id)}
+    {:status 200 :body {:patient map?}})
 
-  ;; (ft/onreq {:status 400}
-  ;;           {:request-method :delete :uri "/api/patient/badid"})
+  (match
+   {:request-method :delete
+    :uri (format "/api/patient/%s" created-id)}
+    {:status 200}))
 
-  )
+(deftest test-getall
+  (handler {:request-method :post
+            :uri "/api/patient"
+            :body {:patient p}})
+  (handler {:request-method :post
+            :uri "/api/patient"
+            :body {:patient p}})
+  (handler {:request-method :post
+            :uri "/api/patient"
+            :body {:patient p}})
+
+  (match
+   {:request-method :get
+    :uri "/api/patients"}
+    {:status 200 :body {:patients vector?}}))

@@ -26,7 +26,8 @@
         "health" {:get #'health}
         "api" {"/patients" {:get #'patient/get-many}
                "/patient" {:post #'patient/create-handler}
-               ["/patient/" :id] {:put #'patient/update-handler
+               ["/patient/" :id] {:get #'patient/get-one-handler
+                                  :put #'patient/update-handler
                                   :delete #'patient/delete-handler}}
         true #'not-found}])
 

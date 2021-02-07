@@ -29,14 +29,20 @@
   (let [query "select * from patients"
         patients (j/query db query)]
     {:status 200
-     :body {:patients patients}}))
+     :body {:patients (vec patients)}}))
 
-(defn get-one-handler [{req :request db :db}]
-  (let [id (-> req :params :id Integer/parseInt)
+(defn- get-one[{req :request db :db}]
+  (let [id (-> req :params :id)
         query ["select * from patients where id = ?" id]
-        patient (first
-                 (j/query db query))]
-    (if (nil? patient) {:status 404} {:status 200 :body {:patient patient}})))
+        patient (first (j/query db query))]
+    (if (nil? patient)
+      {:status 404
+       :body {:error_message "patient not found"}}
+      {:status 200
+       :body {:patient patient}})
+    ))
+
+(def get-one-handler (-> get-one wrap-id))
 
 (defn- update-patient [{req :request db :db}]
   (let [id (-> req :params :id)
@@ -44,9 +50,10 @@
         updated (-> (j/update! db :patients patient ["id = ?" id])
                     first zero? not)]
     (if updated
+      {:status 200}
       {:status 404
        :error_message "patient not found"}
-      {:status 200})))
+      )))
 
 (def update-handler (-> update-patient wrap-patient wrap-id))
 
