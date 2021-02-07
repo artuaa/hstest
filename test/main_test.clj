@@ -8,11 +8,16 @@
 (deftest test-app
   (def ctx (sut/start {:db {:dbname "db_test"}}))
   (def handler (:handler @ctx))
-  (def req {:request-method :get :uri "/health"})
 
-  (m/match (handler req) {:status 200})
+  (defn match [req exp]
+    (let [resp (handler req)]
+      (m/match resp exp)
+      resp))
 
-  (handler {:request-method :get :uri "/api/patients"})
+  (match
+   {:request-method :get
+    :uri "/health"}
+   {:status 200})
 
   (def p {:name "piu piu"
           :address "Mosocw"
@@ -20,8 +25,10 @@
           :policy "1234123412341234"
           :gender "male"})
 
-  (def req {:request-method :post :uri "/api/patient" :body {:patient p}})
-  (m/match (handler req) {:status 201 :body {"id" int?}})
+  (match {:request-method :post
+          :uri "/api/patient"
+          :body {:patient p}}
+         {:status 201 :body {:id int?}})
 
   ;; (ft/onreq {:status 200}
   ;;           {:request-method :get :uri "/api/patients" :body {:patient p}})
