@@ -22,13 +22,13 @@
 (defn health [req] {:status 200 :body "ok"})
 
 (def routes
-  ["/"{"" {:get #'index-handler}
-    "health" {:get #'health}
-    "api" {"/patients" {:get #'patient/get-many}
-            ["/patient/" :id] {:post #'patient/create-handler
-                               :put #'patient/update-handler
-                               :delete #'patient/delete-handler}}
-    true #'not-found}])
+  ["/" {"" {:get #'index-handler}
+        "health" {:get #'health}
+        "api" {"/patients" {:get #'patient/get-many}
+               "/patient" {:post #'patient/create-handler}
+               ["/patient/" :id] {:put #'patient/update-handler
+                                  :delete #'patient/delete-handler}}
+        true #'not-found}])
 
 (defn root-handler [{req :request :as ctx}]
   (let [{:keys [uri]} req

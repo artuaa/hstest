@@ -51,9 +51,9 @@
 (def update-handler (-> update-patient wrap-patient wrap-id))
 
 (defn create-patient [{req :request db :db}]
-  (let [patient (-> req :body :patient)]
-    (j/insert! db :patients patient)
-    {:status 200}))
+  (let [patient (-> req :body :patient)
+        id (-> (j/insert! db :patients patient) first :id)]
+    {:status 201 :body {:id id}}))
 
 (def create-handler (-> create-patient wrap-patient))
 
