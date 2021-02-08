@@ -1,4 +1,4 @@
-^{:watch-dirs ["src/front" "src/shared"]
+^{:watch-dirs ["src/hs/front"]
   :css-dirs   ["resources/public"]}
 {:main hs.front.core
 ;; :output-to     "resources/public/main.js"

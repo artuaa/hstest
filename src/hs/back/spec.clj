@@ -27,13 +27,6 @@
                    :patient/policy]
           :opt-un [:patient/id]))
 
-(defn validate [val] (let [result (s/conform ::patient val)]
-                       (if (= result :clojure.spec.alpha/invalid)
-                         [false (s/explain-data ::patient val)]
-                         [true result])))
-
-(defn confrom [p] (s/conform ::patient p))
-
 (comment (def p {:id 1234
                  :name "Alex"
                  :gender "mALe"

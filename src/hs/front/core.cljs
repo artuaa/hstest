@@ -32,6 +32,10 @@
                             [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
                         (:patients @state/state))]]]))
 
+(defn input [& {:keys [on-change value label]}]
+  [:div [:label label (:name patient)]
+   [:input {:placeholder "Name" :on-change (change :name)  :value (:name @patient)}]])
+
 (defn form [initial submit-fn]
   (let [patient (r/atom initial)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
