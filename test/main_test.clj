@@ -27,7 +27,7 @@
         :policy "1234123412341234"
         :gender "male"})
 
-(deftest test-cud
+(deftest test-create-upd-del
   (match
    {:request-method :get
     :uri "/health"}
