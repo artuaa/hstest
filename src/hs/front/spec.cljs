@@ -1,6 +1,6 @@
 (ns hs.spec
   (:require [clojure.spec.alpha :as s]
-            [hs.spec-base]))
+            [hs.shared.spec :as base]))
 
 (s/def ::->date
   (s/conformer
@@ -10,7 +10,7 @@
            (js/Date. parsed))))))
 
 (s/def :patient/birthdate (s/and
-                           :hs.spec-base/ne-string
+                           ::base/ne-string
                            ::->date))
 
 (s/def ::patient

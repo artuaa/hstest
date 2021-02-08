@@ -1,16 +1,16 @@
-(ns hs.main
+(ns hs.back.core
   (:require
    [bidi.bidi :as bidi]
    [bidi.ring :refer [make-handler]]
-   [hs.patient :as patient]
+   [hs.back.patient :as patient]
    [clojure.java.io :as io]
    [ring.middleware.json :refer [wrap-json-body
                                  wrap-json-response]]
    [ring.middleware.resource :refer [wrap-resource]]
    [ring.middleware.cors :refer [wrap-cors]]
    [ring.logger :refer [wrap-with-logger]]
-   [hs.db.core :as dbcore]
-   [hs.server.core :as server])
+   [hs.back.db.core :as dbcore]
+   [hs.back.server.core :as server])
   (:gen-class))
 
 (defn index-handler [req] {:status 200

@@ -1,7 +1,6 @@
-(ns hs.patient
-  (:require [hs.spec :as hss]
+(ns hs.back.patient
+  (:require [hs.back.spec]
             [clojure.spec.alpha :as s]
-            [clojure.data.json :as json]
             [clojure.java.jdbc :as j]))
 
 (defn- parse-id [val]
@@ -18,12 +17,12 @@
 (defn wrap-patient [handler]
   (fn [{req :request :as ctx}]
     (let [entity (-> req :body :patient)
-          conformed (s/conform :hs.spec/patient (dissoc entity :id))]
+          conformed (s/conform :hs.back.spec/patient (dissoc entity :id))]
       (if (not= conformed ::s/invalid)
         (handler (assoc-in ctx [:request :body :patient] conformed))
         {:status 400
          :body {:error_message "patient is invalid"
-                :error (s/explain-data :hs.spec/patient entity)}}))))
+                :error (s/explain-data :hs.back.spec/patient entity)}}))))
 
 (defn get-many [{req :request db :db}]
   (let [query "select * from patients"
@@ -31,7 +30,7 @@
     {:status 200
      :body {:patients (vec patients)}}))
 
-(defn- get-one[{req :request db :db}]
+(defn- get-one [{req :request db :db}]
   (let [id (-> req :params :id)
         query ["select * from patients where id = ?" id]
         patient (first (j/query db query))]
@@ -39,8 +38,7 @@
       {:status 404
        :body {:error_message "patient not found"}}
       {:status 200
-       :body {:patient patient}})
-    ))
+       :body {:patient patient}})))
 
 (def get-one-handler (-> get-one wrap-id))
 
@@ -52,8 +50,7 @@
     (if updated
       {:status 200}
       {:status 404
-       :error_message "patient not found"}
-      )))
+       :error_message "patient not found"})))
 
 (def update-handler (-> update-patient wrap-patient wrap-id))
 
@@ -74,6 +71,7 @@
 (def delete-handler (-> delete-patient wrap-id))
 
 (comment
+  (def db)
   (-> (j/update! db :patients {:name "hello"} ["id = ?" 340])
       first
       zero?)

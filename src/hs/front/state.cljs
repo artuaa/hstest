@@ -1,9 +1,8 @@
-(ns hs.state
+(ns hs.front.state
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
    [cljs-http.client :as http]
    [reagent.core :as r]
-   [hs.spec]
    [clojure.spec.alpha :as s]
    [cljs.core.async :refer [<!]]))
 

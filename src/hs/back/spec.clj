@@ -1,6 +1,6 @@
 (ns hs.spec
   (:require [clojure.spec.alpha :as s]
-            [hs.spec-base :as b]
+            [hs.shared.spec :as base]
             [clojure.instant :refer [read-instant-date]]))
 
 (s/def ::->date
@@ -16,7 +16,7 @@
          ::s/invalid)))))
 
 (s/def :patient/birthdate (s/and
-                           ::b/ne-string
+                           ::base/ne-string
                            ::->date))
 
 (s/def ::patient

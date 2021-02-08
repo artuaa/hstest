@@ -1,4 +1,4 @@
-(ns hs.db.core)
+(ns hs.back.db.core)
 
 ;; (def db  {:dbtype "postgresql"
 ;;           :dbname "db_dev"
@@ -10,8 +10,8 @@
 (defn connection [ctx]
   (let [cfg (get-in ctx [:config :db])]
     {:dbtype "postgresql"
-      :dbname (:dbname cfg)
-      :host "localhost"
-      :user "postgres"
-      :password "mysecretpassword"
-      :port 5432}))
+     :dbname (:dbname cfg)
+     :host "localhost"
+     :user "postgres"
+     :password "mysecretpassword"
+     :port 5432}))

@@ -1,11 +1,11 @@
-(ns ^:figwheel-hooks hs.main
+(ns ^:figwheel-hooks hs.front.core
   (:require
    [reagent.dom :as r.dom]
-   [hs.state :as state]
+   [hs.front.spec]
+   [hs.front.state :as state]
    [reagent.session :as session]
    [accountant.core :as accountant]
    [bidi.bidi :as bidi]
-   [hs.spec]
    [clojure.spec.alpha :as s]
    [reagent.core :as r]))
 
@@ -61,7 +61,7 @@
                  :address ""}]
     [form initial #()]))
 
-(defn update-patient [v] (let [conformed (s/conform :hs.spec/patient v)]
+(defn update-patient [v] (let [conformed (s/conform :hs.front.spec/patient v)]
                            (if (= conformed ::s/invalid)
                              (js/alert "Data is invalid")
                              (state/update-patient conformed))))

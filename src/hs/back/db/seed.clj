@@ -1,8 +1,8 @@
- (ns db.seed
+ (ns db.back.seed
    (:require [clojure.java.io :as io]
              [clojure.java.jdbc :as jdbc]
              [clojure.edn :as edn]
-             [hs.db.core :refer [db]]))
+             [hs.back.db.core :refer [db]]))
 
 (defn insert-seed!
   "Inserts a single seed definition into the database."

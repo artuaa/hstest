@@ -1,6 +1,6 @@
-^{:watch-dirs ["src/cljs" "src/cljc"]
+^{:watch-dirs ["src/front" "src/shared"]
   :css-dirs   ["resources/public"]}
-{:main hs.main
+{:main hs.front.core
 ;; :output-to     "resources/public/main.js"
 ;;  :output-dir    "resources/public/main.out"
  }

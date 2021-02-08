@@ -1,5 +1,5 @@
 {:paths
- ["src/clj" "src/cljc" "src/cljs"  "resources", "target"]
+ ["src" "resources", "target"]
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.764"}
   reagent/reagent {:mvn/version "1.0.0"}

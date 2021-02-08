@@ -1,4 +1,4 @@
-(ns hs.server.core
+(ns hs.back.server.core
   (:require [ring.adapter.jetty :as adapter]))
 
 (defn start [cfg handler]

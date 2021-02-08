@@ -1,4 +1,4 @@
-(ns hs.spec-base
+(ns hs.shared.spec
   (:require [clojure.spec.alpha :as s]))
 
 
@@ -18,9 +18,9 @@
                         (fn [val] (= (count val) 16))))
 
 (defn validate [val] (let [result (s/conform ::patient val)]
- (if (= result :clojure.spec.alpha/invalid)
-   [false (s/explain-data ::patient val)]
-   [true result])))
+                       (if (= result :clojure.spec.alpha/invalid)
+                         [false (s/explain-data ::patient val)]
+                         [true result])))
 
 (defn confrom [p] (s/conform ::patient p))
 
