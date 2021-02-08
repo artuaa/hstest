@@ -1,22 +1,15 @@
 html,body{
     width:100%;
 }
+
 body{
     display: flex;
     flex-direction: column;
     align-items: center;
     max-width: 1200px;
 }
+
 #root{
     width: 100vh;
 }
-.form{
-    display: flex;
-    flex-direction: column;
-}
-.form > label {
-    margin-bottom: 2px;
-}
-.form > input, .form > select {
-    margin-bottom: 10px;
-}
+

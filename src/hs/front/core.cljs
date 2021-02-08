@@ -32,28 +32,31 @@
                             [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
                         (:patients @state/state))]]]))
 
-(defn input [& {:keys [on-change value label]}]
-  [:div [:label label (:name patient)]
-   [:input {:placeholder "Name" :on-change (change :name)  :value (:name @patient)}]])
+(defn input [& {:keys [on-change value label type error]}]
+  [:div {:class "flex flex-col mb-2"} [:label label]
+   [:input {:class (str "p-1 rounded-md border "
+                        (if (nil? error) "border-gray-400" "border-red-400"))
+            :placeholder label
+            :type type
+            :on-change on-change
+            :value value}]
+   [:span {:class "text-red-400"} error]])
 
 (defn form [initial submit-fn]
   (let [patient (r/atom initial)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
     (fn []
-      [:form.form
-       [:label {:for "Name!"} "Name" (:name patient)]
-       [:input {:id "Name" :placeholder "Name" :on-change (change :name)  :value (:name @patient)}]
-       [:label {:for "Gender"} "Gender"]
-       [:select {:id "Gender" :placeholder "Gender" :on-change (change :gender) :value (:gender @patient)}
+      [:form {:class "flex flex-col"}
+       [input :error "field error" :label "Name" :on-change (change :name)  :value (:name @patient)]
+       [:label "Gender"]
+       [:select {:class "mb-2 p-1 rounded-md border border-gray-400" :placeholder "Gender" :on-change (change :gender) :value (:gender @patient)}
         [:option {:value "male"} "Male"]
         [:option {:value "female"} "Female"]]
-       [:label {:for "Birthday"} "Birthday"]
-       [:input {:id "Birthday" :placeholder "Birthday" :type "date" :on-change (change :birthdate) :value (:birthdate @patient)}]
-       [:label {:for "Address"} "Address"]
-       [:input {:id "Address" :placeholder "Address" :on-change (change :address) :value (:address @patient)}]
-       [:label {:for "Policy"} "Policy"]
-       [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
-       [:button {:on-click (fn [e]
+       [input :label "Birthday" :type "date" :on-change (change :birthdate) :value (:birthdate @patient)]
+       [input :label "Address" :on-change (change :address) :value (:address @patient)]
+       [input :label "Policy" :on-change (change :policy) :value (:policy @patient)]
+       [:button {:class "bg-yellow-200 rounded-md border w-1/2 mt-6 self-center"
+                 :on-click (fn [e]
                              (.preventDefault e)
                              (submit-fn @patient))} "Save"]])))
 
