@@ -9,13 +9,6 @@
    [clojure.spec.alpha :as s]
    [reagent.core :as r]))
 
-(comment
-  (session/get :route)
-  (bidi/match-route app-routes "/patient/123")
-  (bidi/path-for app-routes :update :id 13)
-  (->> @state/state :patients (filter #(= (:id %) 360)) first)
-  )
-
 (def app-routes
   ["/" {"" :index
         "patient" {"" :create
@@ -39,7 +32,7 @@
                             [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
                         (:patients @state/state))]]]))
 
-(defn  form [initial submit-fn]
+(defn form [initial submit-fn]
   (let [patient (r/atom initial)
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
     (fn []
@@ -58,8 +51,7 @@
        [:input {:id "Policy" :placeholder "Policy" :on-change (change :policy) :value (:policy @patient)}]
        [:button {:on-click (fn [e]
                              (.preventDefault e)
-                             (submit-fn @patient)
-                             )}"Save"]])))
+                             (submit-fn @patient))} "Save"]])))
 
 (defmethod page-contents :create []
   (let [initial {:name ""
@@ -70,18 +62,18 @@
     [form initial #()]))
 
 (defn update-patient [v] (let [conformed (s/conform :hs.spec/patient v)]
-                   (if (= conformed ::s/invalid)
-                     (js/alert "Data is invalid")
-                     (state/update-patient conformed))))
+                           (if (= conformed ::s/invalid)
+                             (js/alert "Data is invalid")
+                             (state/update-patient conformed))))
 
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         initial (->> @state/state :patients (filter #(= (:id %) id)) first)]
 
-  (js/console.log initial)
-  [form initial update-patient]))
+    (js/console.log initial)
+    [form initial update-patient]))
 
-(defmethod page-contents :default [] [:div "hello"])
+(defmethod page-contents :default [] [:div "page not found"])
 
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
@@ -111,3 +103,9 @@
   (accountant/dispatch-current!))
 
 (init!)
+
+(comment
+  (session/get :route)
+  (bidi/match-route app-routes "/patient/123")
+  (bidi/path-for app-routes :update :id 13)
+  (->> @state/state :patients (filter #(= (:id %) 360)) first))
