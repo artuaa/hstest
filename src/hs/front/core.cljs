@@ -18,19 +18,35 @@
 
 (defmethod page-contents :index []
   (state/get-patients)
-  (fn [] [:div [:h1 "Patients"]
-          [:table
-           [:thead [:tr [:th "Name"] [:th "Gender"] [:th "Birthday"] [:th "Address"] [:th "Policy"] [:th "Actions"]]]
-           [:tbody (map (fn [item]
-                          [:tr {:key (:id item)}
-                           [:td [:a {:href "heloo"} (:name item)]]
-                           [:td (:gender item)]
-                           [:td (:birthday item)]
-                           [:td (:address item)]
-                           [:td (:policy item)]
-                           [:td [:a {:href (bidi/path-for app-routes :update :id (:id item))} "edit"]
-                            [:button {:on-click #(state/delete-patient (:id item))} "Delete"]]])
-                        (:patients @state/state))]]]))
+  (fn [] (let [headcol (fn [child]
+                         [:th {:scope "col" :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"} child])
+               rowcol (fn [child]
+                        [:td {:class "px-6 py-4 whitespace-nowrap"} child])]
+           [:div {:class "flex flex-col"}
+            [:div {:class "-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"}
+             [:div {:class "py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"}
+              [:div {:class "shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"}
+               [:table {:class "min-w-full divide-y divide-gray-200"}
+                [:thead {:class "bg-gray-50"}
+                 [:tr
+                  [headcol "Name"]
+                  [headcol "Gender"]
+                  [headcol "Birthdate"]
+                  [headcol "Address"]
+                  [headcol "Policy"]
+                  [headcol "Actions"]]]
+                [:tbody {:class "bg-white divide-y divide-gray-200"}
+                 (for [item (:patients @state/state)]
+                   ^{:key (:id item)} [:tr
+                                       [rowcol (:name item)]
+                                       [rowcol (:gender item)]
+                                       [rowcol (:birthdate item)]
+                                       [rowcol (:address item)]
+                                       [rowcol (:policy item)]
+                                       [rowcol [:a {:href (bidi/path-for app-routes :update :id (:id item))
+                                                    :class "text-indigo-600 hover:text-indigo-900"} "Edit"]]
+                                       [rowcol [:button {:on-click #(state/delete-patient (:id item))
+                                                         :class "text-red-600 hover:text-red-900"} "Delete"]]])]]]]]])))
 
 (defn input [& {:keys [on-change value label type error]}]
   [:div {:class "flex flex-col mb-2"} [:label label]
