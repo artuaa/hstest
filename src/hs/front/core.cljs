@@ -42,23 +42,38 @@
             :value value}]
    [:span {:class "text-red-400"} error]])
 
+(def error-messages {:name "Name required"
+                     :gender "Gender required"
+                     :address "Adress required"
+                     :birthdate "Birthdate required"
+                     :policy "Policy number must contain 16 characters"})
+
+(defn get-errors [{problems ::s/problems}]
+  (->> problems (map (comp first :path))
+       (reduce #(assoc %1 %2 (get error-messages %2)) {})))
+
 (defn form [initial submit-fn]
   (let [patient (r/atom initial)
-        change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))]
+        errors (r/atom {})
+        change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))
+        validate (fn [] (let [exp (s/explain-data :hs.front.spec/patient @patient)]
+                          (reset! errors (get-errors exp))))]
     (fn []
       [:form {:class "flex flex-col"}
-       [input :error "field error" :label "Name" :on-change (change :name)  :value (:name @patient)]
+       [input :error (:name @errors)  :label "Name" :on-change (change :name)  :value (:name @patient)]
        [:label "Gender"]
        [:select {:class "mb-2 p-1 rounded-md border border-gray-400" :placeholder "Gender" :on-change (change :gender) :value (:gender @patient)}
         [:option {:value "male"} "Male"]
         [:option {:value "female"} "Female"]]
-       [input :label "Birthday" :type "date" :on-change (change :birthdate) :value (:birthdate @patient)]
-       [input :label "Address" :on-change (change :address) :value (:address @patient)]
-       [input :label "Policy" :on-change (change :policy) :value (:policy @patient)]
+       [input :error (:birthdate @errors) :label "Birthday" :type "date" :on-change (change :birthdate) :value (:birthdate @patient)]
+       [input :error (:address @errors) :label "Address" :on-change (change :address) :value (:address @patient)]
+       [input :error (:policy @errors) :label "Policy" :on-change (change :policy) :value (:policy @patient)]
        [:button {:class "bg-yellow-200 rounded-md border w-1/2 mt-6 self-center"
                  :on-click (fn [e]
                              (.preventDefault e)
-                             (submit-fn @patient))} "Save"]])))
+                             (validate)
+                             ;; (submit-fn @patient)
+                             )}"Save"]])))
 
 (defmethod page-contents :create []
   (let [initial {:name ""
@@ -112,6 +127,25 @@
 (init!)
 
 (comment
+  (def expn (s/explain-data
+             :hs.front.spec/patient
+             {:name "hello"
+              :gender ""
+              :address ""
+              :policy "123412341234123"
+              :birthdate "2012-13-13"}))
+
+  (map :path (::s/problems expn))
+
+  (def error-messages {:name "Name required"
+                       :gender "Gender required"
+                       :address "Adress required"
+                       :birthdate "Birthdate required"
+                       :policy "Policy number must contain 16 characters"})
+
+  (second (::s/problems expn))
+  (get-errors expn)
+
   (session/get :route)
   (bidi/match-route app-routes "/patient/123")
   (bidi/path-for app-routes :update :id 13)
