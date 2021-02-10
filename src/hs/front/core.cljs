@@ -4,7 +4,6 @@
    [hs.front.spec]
    [hs.front.state :as state]
    [reagent.session :as session]
-   [cljs-time.format :as t.format]
    [cljs-time.core :as time]
    [cljs-time.format :as tf]
    [accountant.core :as accountant]
@@ -30,7 +29,7 @@
   (fn [] (let [headcol (fn [child]
                          [:th {:scope "col" :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"} child])
                rowcol (fn [child]
-                        [:td {:class "px-6 py-4 whitespace-nowrap"} child])]
+                        [:td {:class "truncate max-w-xs px-6 py-4"} child])]
            [:div {:class "flex flex-col"}
             [:div {:class "-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"}
              [:div {:class "py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"}
@@ -128,7 +127,7 @@
                              (validate)
                              (js/console.log (clj->js @errors))
                              (when (empty? @errors)
-                               (submit-fn @patient)))} "Save"]])))
+                               (submit-fn (s/conform :hs.front.spec/patient @patient))))} "Save"]])))
 
 (defmethod page-contents :create []
   (let [initial {:name ""
@@ -138,24 +137,24 @@
                  :address ""}
         on-submit
         (fn [v]
-          (state/create-patient (s/conform :hs.front.spec/patient v))
+          (state/create-patient v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
-(defn update-patient [v] (let [conformed (s/conform :hs.front.spec/patient v)]
-                           (if (= conformed ::s/invalid)
-                             (js/alert "Data is invalid")
-                             (state/update-patient conformed))))
 
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         initial (->> @state/state
                      :patients
                      (filter #(= (:id %) id)) first
-                     (s/unform :hs.front.spec/patient))]
+                     (s/unform :hs.front.spec/patient))
+        on-submit
+        (fn [v]
+          (state/update-patient v)
+          (accountant/navigate! "/"))]
 
     (js/console.log initial)
-    [form initial update-patient]))
+    [form initial on-submit]))
 
 (defmethod page-contents :default [] [:div "page not found"])
 
