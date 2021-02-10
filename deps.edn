@@ -4,6 +4,7 @@
  {org.clojure/clojurescript {:mvn/version "1.10.764"}
   reagent/reagent {:mvn/version "1.0.0"}
   reagent-utils/reagent-utils {:mvn/version "0.3.3"}
+  com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
   bidi/bidi {:mvn/version "2.1.6"}
   venantius/accountant {:mvn/version "0.2.5"}
   cljs-http/cljs-http {:mvn/version "0.1.46"}

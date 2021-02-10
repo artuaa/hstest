@@ -4,10 +4,14 @@
    [hs.front.spec]
    [hs.front.state :as state]
    [reagent.session :as session]
+   [cljs-time.format :as t.format]
+   [cljs-time.core :as time]
+   [cljs-time.format :as tf]
    [accountant.core :as accountant]
    [bidi.bidi :as bidi]
    [clojure.spec.alpha :as s]
-   [reagent.core :as r]))
+   [reagent.core :as r]
+   [clojure.string :as str]))
 
 (def app-routes
   ["/" {"" :index
@@ -17,7 +21,9 @@
 (defmulti page-contents identity)
 
 (defn format-date [date]
-  (str (.getFullYear date) "-" (inc (.getMonth date)) "-" (inc (.getDate date))))
+  (when date (tf/unparse
+              (tf/formatter "YYYY-MM-dd")
+              (time/to-default-time-zone date))))
 
 (defmethod page-contents :index []
   (state/get-patients)
@@ -36,7 +42,7 @@
                   [headcol "Gender"]
                   [headcol "Birthdate"]
                   [headcol "Address"]
-                  [headcol "Policy"]
+                  [headcol "Policy number"]
                   [headcol ""]
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
@@ -80,30 +86,51 @@
                           (reset! errors (get-errors exp))))]
     (fn []
       [:form {:class "flex flex-col"}
-       [input :error (:name @errors)  :label "Name" :on-change (change :name)  :value (:name @patient)]
+       [input :error (:name @errors)
+        :label "Name"
+        :on-change (change :name)
+        :value (:name @patient)]
        [:label "Gender"]
-       [:select {:class "mb-2 p-1 rounded-md border border-gray-400" :placeholder "Gender" :on-change (change :gender) :value (:gender @patient)}
+       [:select {:class "mb-2 p-1 rounded-md border border-gray-400"
+                 :placeholder "Gender"
+                 :on-change
+                 (change :gender)
+                 :value (:gender @patient)}
         [:option {:value "male"} "Male"]
         [:option {:value "female"} "Female"]]
-       [input :error (:birthdate @errors) :label "Birthday" :type "date" :on-change (change :birthdate) :value (:birthdate @patient)]
-       [input :error (:address @errors) :label "Address" :on-change (change :address) :value (:address @patient)]
-       [input :error (:policy @errors) :label "Policy" :on-change (change :policy) :value (:policy @patient)]
+       [input :error (:birthdate @errors)
+        :label "Birthday"
+        :type "date"
+        :on-change (change :birthdate)
+        :value (format-date (:birthdate @patient))]
+       [input
+        :error (:address @errors)
+        :label "Address"
+        :on-change (change :address)
+        :value (:address @patient)]
+       [input :error (:policy @errors)
+        :label "Policy"
+        :on-change (change :policy)
+        :value (:policy @patient)]
        [:button {:class "bg-yellow-200 rounded-md border w-1/2 mt-6 self-center"
                  :on-click (fn [e]
                              (.preventDefault e)
                              (validate)
                              (js/console.log (clj->js @errors))
                              (when (empty? @errors)
-                                (submit-fn @patient))
-                             )}"Save"]])))
+                               (submit-fn @patient)))} "Save"]])))
 
 (defmethod page-contents :create []
   (let [initial {:name ""
                  :birthdate nil
                  :gender "male"
                  :policy ""
-                 :address ""}]
-    [form initial #(state/create-patient (s/conform :hs.front.spec/patient %))]))
+                 :address ""}
+        on-submit
+        (fn [v]
+          (state/create-patient (s/conform :hs.front.spec/patient v))
+          (accountant/navigate! "/"))]
+    [form initial on-submit]))
 
 (defn update-patient [v] (let [conformed (s/conform :hs.front.spec/patient v)]
                            (if (= conformed ::s/invalid)
