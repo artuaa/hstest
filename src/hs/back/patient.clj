@@ -78,6 +78,7 @@
 
   (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/birthdate "1234") :name "hello"}))
 
+(s/valid? :hs.back.spec/patient {})
 (update-handler {:params {:id "13"}})
 
 (def patient {:name "hello"

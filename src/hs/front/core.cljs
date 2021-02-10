@@ -16,6 +16,9 @@
 
 (defmulti page-contents identity)
 
+(defn format-date [date]
+  (str (.getFullYear date) "-" (inc (.getMonth date)) "-" (inc (.getDate date))))
+
 (defmethod page-contents :index []
   (state/get-patients)
   (fn [] (let [headcol (fn [child]
@@ -34,13 +37,14 @@
                   [headcol "Birthdate"]
                   [headcol "Address"]
                   [headcol "Policy"]
+                  [headcol ""]
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
                  (for [item (:patients @state/state)]
                    ^{:key (:id item)} [:tr
                                        [rowcol (:name item)]
                                        [rowcol (:gender item)]
-                                       [rowcol (:birthdate item)]
+                                       [rowcol (format-date (:birthdate item))]
                                        [rowcol (:address item)]
                                        [rowcol (:policy item)]
                                        [rowcol [:a {:href (bidi/path-for app-routes :update :id (:id item))
@@ -88,7 +92,9 @@
                  :on-click (fn [e]
                              (.preventDefault e)
                              (validate)
-                             ;; (submit-fn @patient)
+                             (js/console.log (clj->js @errors))
+                             (when (empty? @errors)
+                                (submit-fn @patient))
                              )}"Save"]])))
 
 (defmethod page-contents :create []
@@ -97,7 +103,7 @@
                  :gender "male"
                  :policy ""
                  :address ""}]
-    [form initial #()]))
+    [form initial #(state/create-patient (s/conform :hs.front.spec/patient %))]))
 
 (defn update-patient [v] (let [conformed (s/conform :hs.front.spec/patient v)]
                            (if (= conformed ::s/invalid)
@@ -115,8 +121,9 @@
 
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
-           [:div [:div [:a {:href (bidi/path-for app-routes :index)} "HOME"]
-                  [:a {:href (bidi/path-for app-routes :create)} "CREATE"]]
+           [:div [:div {:class "my-4"}
+                  [:a {:class "hover:underline mr-4" :href (bidi/path-for app-routes :index)} "HOME"]
+                  [:a {:class "hover:underline" :href (bidi/path-for app-routes :create)} "CREATE"]]
             ^{:key route} [page-contents route]])))
 
 (defn mount []
@@ -153,16 +160,13 @@
 
   (map :path (::s/problems expn))
 
-  (def error-messages {:name "Name required"
-                       :gender "Gender required"
-                       :address "Adress required"
-                       :birthdate "Birthdate required"
-                       :policy "Policy number must contain 16 characters"})
-
   (second (::s/problems expn))
   (get-errors expn)
 
   (session/get :route)
   (bidi/match-route app-routes "/patient/123")
   (bidi/path-for app-routes :update :id 13)
-  (->> @state/state :patients (filter #(= (:id %) 360)) first))
+  (->> @state/state :patients (filter #(= (:id %) 360)) first)
+  (def d (js/Date. (.now js/Date)))
+  (type d)
+  (format-date d))

@@ -1,4 +1,4 @@
-(ns hs.spec
+(ns hs.back.spec
   (:require [clojure.spec.alpha :as s]
             [hs.shared.spec :as base]
             [clojure.instant :refer [read-instant-date]]))

@@ -9,8 +9,10 @@
    [ring.middleware.resource :refer [wrap-resource]]
    [ring.middleware.cors :refer [wrap-cors]]
    [ring.logger :refer [wrap-with-logger]]
+   [hs.back.spec]
    [hs.back.db.core :as dbcore]
-   [hs.back.server.core :as server])
+   [hs.back.server.core :as server]
+   [clojure.java.jdbc :as jdbc])
   (:gen-class))
 
 (defn index-handler [req] {:status 200
@@ -65,6 +67,7 @@
 (comment
   (def ctx (start config))
   (stop @ctx)
+  (jdbc/execute! (:db @ctx) "delete from patients;")
   (def req {:request-method :get :uri "/"})
   (bidi/match-route* routes (:uri req) req)
   (root-handler req))
