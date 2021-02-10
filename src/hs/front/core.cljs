@@ -21,9 +21,9 @@
 (defmulti page-contents identity)
 
 (defn format-date [date]
-  (when date (tf/unparse
-              (tf/formatter "YYYY-MM-dd")
-              (time/to-default-time-zone date))))
+  (when date(tf/unparse
+             (tf/formatter "YYYY-MM-dd")
+             (time/to-default-time-zone date))))
 
 (defmethod page-contents :index []
   (state/get-patients)
@@ -83,9 +83,10 @@
         errors (r/atom {})
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))
         validate (fn [] (let [exp (s/explain-data :hs.front.spec/patient @patient)]
+                          (js/console.log (clj->js exp))
                           (reset! errors (get-errors exp))))]
     (fn []
-      [:form {:class "flex flex-col"}
+      [:form {:class "flex flex-col w-screen max-w-xl"}
        [input :error (:name @errors)
         :label "Name"
         :on-change (change :name)
@@ -139,7 +140,10 @@
 
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
-        initial (->> @state/state :patients (filter #(= (:id %) id)) first)]
+        initial (->> @state/state
+                     :patients
+                     (filter #(= (:id %) id)) first
+                     (s/unform :hs.front.spec/patient))]
 
     (js/console.log initial)
     [form initial update-patient]))
@@ -184,7 +188,12 @@
               :address ""
               :policy "123412341234123"
               :birthdate "2012-13-13"}))
-
+(def p {:name "hello"
+              :gender ""
+              :address ""
+              :policy "123412341234123"
+              :birthdate "2012-13-13"})
+  (s/unform :hs.front.spec/patient p)
   (map :path (::s/problems expn))
 
   (second (::s/problems expn))

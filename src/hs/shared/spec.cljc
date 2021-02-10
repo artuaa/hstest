@@ -10,7 +10,9 @@
 (s/def :patient/address ::ne-string)
 (s/def :patient/gender (s/and
                         ::ne-string
-                        (s/conformer clojure.string/lower-case)
+                        (s/conformer
+                         clojure.string/lower-case
+                         identity)
                         (fn [val] (contains? #{"male" "female"} val))))
 
 (s/def :patient/policy (s/and
