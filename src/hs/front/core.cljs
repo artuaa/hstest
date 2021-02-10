@@ -58,10 +58,12 @@
                                        [rowcol [:button {:on-click #(state/delete-patient (:id item))
                                                          :class "text-red-600 hover:text-red-900"} "Delete"]]])]]]]]])))
 
-(defn input [& {:keys [on-change value label type error]}]
+(defn input [& {:keys [on-change value label type error min max]}]
   [:div {:class "flex flex-col mb-2"} [:label label]
    [:input {:class (str "p-1 rounded-md border "
                         (if (nil? error) "border-gray-400" "border-red-400"))
+            :min min
+            :max max
             :placeholder label
             :type type
             :on-change on-change
@@ -84,7 +86,11 @@
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))
         validate (fn [] (let [exp (s/explain-data :hs.front.spec/patient @patient)]
                           (js/console.log (clj->js exp))
-                          (reset! errors (get-errors exp))))]
+                          (reset! errors (get-errors exp))))
+        format-date (fn [date]
+                      (tf/unparse (tf/formatter "YYYY-MM-dd") date))
+        maxdate (format-date (time/now))
+        mindate (format-date (time/minus (time/now ) (time/years 100)))]
     (fn []
       [:form {:class "flex flex-col w-screen max-w-xl"}
        [input :error (:name @errors)
@@ -99,11 +105,14 @@
                  :value (:gender @patient)}
         [:option {:value "male"} "Male"]
         [:option {:value "female"} "Female"]]
-       [input :error (:birthdate @errors)
+       [input
+        :error (:birthdate @errors)
         :label "Birthday"
         :type "date"
+        :min mindate
+        :max maxdate
         :on-change (change :birthdate)
-        :value (format-date (:birthdate @patient))]
+        :value (:birthdate @patient)]
        [input
         :error (:address @errors)
         :label "Address"
