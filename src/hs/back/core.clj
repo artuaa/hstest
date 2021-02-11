@@ -12,12 +12,13 @@
    [hs.back.spec]
    [hs.back.db.core :as dbcore]
    [hs.back.server.core :as server]
+   [ring.util.response :as rr]
    [clojure.java.jdbc :as jdbc])
   (:gen-class))
 
-(defn index-handler [req] {:status 200
-                           :headers {"Content-type" "text/html"}
-                           :body (-> "public/index.html" io/resource slurp)})
+(defn index-handler [req]
+  (-> (rr/resource-response "index.html" {:root "public"})
+      (rr/content-type "text/html; charset=utf-8")))
 
 (defn not-found [req] {:status 404 :body "page not found"})
 
@@ -25,8 +26,10 @@
 
 (def routes
   ["/" {"" {:get #'index-handler}
-        "health" {:get #'health}
-        "api" {"/patients" {:get #'patient/get-many}
+        "patient" {:get #'index-handler}
+        ["patient/" :id] {:get #'index-handler}
+        "api" {"health" {:get #'health}
+               "/patients" {:get #'patient/get-many}
                "/patient" {:post #'patient/create-handler}
                ["/patient/" :id] {:get #'patient/get-one-handler
                                   :put #'patient/update-handler
