@@ -6,6 +6,11 @@
    [clojure.spec.alpha :as s]
    [cljs.core.async :refer [<!]]))
 
+;; {
+;;  :ok true
+;;  :error "Some error"
+;; }
+
 (defn get-url [path] (str "http://localhost:8080" path))
 
 (defn ok? [status] (< status 300))

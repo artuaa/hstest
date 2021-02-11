@@ -20,14 +20,16 @@
 (defmulti page-contents identity)
 
 (defn format-date [date]
-  (when date(tf/unparse
-             (tf/formatter "YYYY-MM-dd")
-             (time/to-default-time-zone date))))
+  (when date (tf/unparse
+              (tf/formatter "YYYY-MM-dd")
+              (time/to-default-time-zone date))))
 
 (defmethod page-contents :index []
   (state/get-patients)
   (fn [] (let [headcol (fn [child]
-                         [:th {:scope "col" :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"} child])
+                        [:th {:scope "col"
+                              :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
+                         child])
                rowcol (fn [child]
                         [:td {:class "truncate max-w-xs px-6 py-4"} child])]
            [:div {:class "flex flex-col"}
@@ -46,16 +48,21 @@
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
                  (for [item (:patients @state/state)]
-                   ^{:key (:id item)} [:tr
-                                       [rowcol (:name item)]
-                                       [rowcol (:gender item)]
-                                       [rowcol (format-date (:birthdate item))]
-                                       [rowcol (:address item)]
-                                       [rowcol (:policy item)]
-                                       [rowcol [:a {:href (bidi/path-for app-routes :update :id (:id item))
-                                                    :class "text-indigo-600 hover:text-indigo-900"} "Edit"]]
-                                       [rowcol [:button {:on-click #(state/delete-patient (:id item))
-                                                         :class "text-red-600 hover:text-red-900"} "Delete"]]])]]]]]])))
+                   ^{:key (:id item)}
+                   [:tr
+                    [rowcol (:name item)]
+                    [rowcol (:gender item)]
+                    [rowcol (format-date (:birthdate item))]
+                    [rowcol (:address item)]
+                    [rowcol (:policy item)]
+                    [rowcol
+                     [:a {:href (bidi/path-for app-routes :update :id (:id item))
+                          :class "text-indigo-600 hover:text-indigo-900"}
+                      "Edit"]]
+                    [rowcol
+                     [:button {:on-click #(state/delete-patient (:id item))
+                               :class "text-red-600 hover:text-red-900"}
+                      "Delete"]]])]]]]]])))
 
 (defn input [& {:keys [on-change value label type error min max]}]
   [:div {:class "flex flex-col mb-2"} [:label label]
@@ -89,7 +96,7 @@
         format-date (fn [date]
                       (tf/unparse (tf/formatter "YYYY-MM-dd") date))
         maxdate (format-date (time/now))
-        mindate (format-date (time/minus (time/now ) (time/years 100)))]
+        mindate (format-date (time/minus (time/now) (time/years 100)))]
     (fn []
       [:form {:class "flex flex-col w-screen max-w-xl"}
        [input :error (:name @errors)
@@ -121,13 +128,16 @@
         :label "Policy"
         :on-change (change :policy)
         :value (:policy @patient)]
-       [:button {:class "bg-yellow-200 rounded-md border w-1/2 mt-6 self-center"
-                 :on-click (fn [e]
-                             (.preventDefault e)
-                             (validate)
-                             (js/console.log (clj->js @errors))
-                             (when (empty? @errors)
-                               (submit-fn (s/conform :hs.front.spec/patient @patient))))} "Save"]])))
+       [:button
+        {:class "bg-yellow-200 rounded-md border w-1/2 mt-6 self-center"
+         :on-click
+         (fn [e]
+           (.preventDefault e)
+           (validate)
+           (js/console.log (clj->js @errors))
+           (when (empty? @errors)
+             (submit-fn (s/conform :hs.front.spec/patient @patient))))}
+        "Save"]])))
 
 (defmethod page-contents :create []
   (let [initial {:name ""
@@ -140,7 +150,6 @@
           (state/create-patient v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
-
 
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
@@ -161,8 +170,10 @@
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
            [:div [:div {:class "my-4"}
-                  [:a {:class "hover:underline mr-4" :href (bidi/path-for app-routes :index)} "HOME"]
-                  [:a {:class "hover:underline" :href (bidi/path-for app-routes :create)} "CREATE"]]
+                  [:a {:class "hover:underline mr-4"
+                       :href (bidi/path-for app-routes :index)} "HOME"]
+                  [:a {:class "hover:underline"
+                       :href (bidi/path-for app-routes :create)} "CREATE"]]
             ^{:key route} [page-contents route]])))
 
 (defn mount []
@@ -175,8 +186,7 @@
 
 (defn ^:export init! []
   (accountant/configure-navigation!
-   {:nav-handler (fn
-                   [path]
+   {:nav-handler (fn [path]
                    (let [match (bidi/match-route app-routes path)
                          current-page (:handler match)
                          route-params (:route-params match)]
@@ -196,11 +206,11 @@
               :address ""
               :policy "123412341234123"
               :birthdate "2012-13-13"}))
-(def p {:name "hello"
-              :gender ""
-              :address ""
-              :policy "123412341234123"
-              :birthdate "2012-13-13"})
+  (def p {:name "hello"
+          :gender ""
+          :address ""
+          :policy "123412341234123"
+          :birthdate "2012-13-13"})
   (s/unform :hs.front.spec/patient p)
   (map :path (::s/problems expn))
 
