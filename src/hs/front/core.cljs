@@ -180,7 +180,8 @@
                        :href (bidi/path-for app-routes :index)} "HOME"]
                   [:a {:class "hover:underline"
                        :href (bidi/path-for app-routes :create)} "CREATE"]]
-            ^{:key route} [page-contents route]])))
+            ;; ^{:key route} [page-contents route]
+            ])))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))

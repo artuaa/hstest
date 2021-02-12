@@ -11,20 +11,35 @@
 ;;  :error "Some error"
 ;; }
 
-(defn get-url [path] (str "http://localhost:8080" path))
+(defn request! [req]
+  (http/request
+   (merge req {:url (str "http://localhost:8080" (:url req))
+               :with-credentials? false})))
 
 (defn ok? [status] (< status 300))
 
-(def state (r/atom {:patients {}}))
+(def app-state (r/atom {:patients {}}))
 
-(defn get-patients []
+(defn patients-loaded [state patients]
+  (->> patients
+       (map #(s/conform :hs.front.spec/patient %))
+       (reduce #(assoc %1 (:id %2) %2) {})
+       (state assoc :patients)))
+
+(defn patient-loaded [state patient]
+  (state assoc (:id patient) patient))
+
+(defn patient-deleted [state id]
+  (dissoc-in state [:patients id]))
+
+(defn get-patients! []
   (go (let [{:keys [status body]}
             (<! (http/get (get-url "/api/patients") {:with-credentials? false}))]
         (swap! state assoc :patients
                (->> body
                     :patients
                     (map #(s/conform :hs.front.spec/patient %))
-                    (reduce #(assoc %1 (:id %2) %2 ) {})))
+                    (reduce #(assoc %1 (:id %2) %2) {})))
         {:ok (< (:status status) 300)})))
 
 (defn update-patient [patient]
