@@ -27,9 +27,9 @@
 (defmethod page-contents :index []
   (state/get-patients)
   (fn [] (let [headcol (fn [child]
-                        [:th {:scope "col"
-                              :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
-                         child])
+                         [:th {:scope "col"
+                               :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
+                          child])
                rowcol (fn [child]
                         [:td {:class "truncate max-w-xs px-6 py-4"} child])]
            [:div {:class "flex flex-col"}
@@ -47,7 +47,7 @@
                   [headcol ""]
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
-                 (for [item (:patients @state/state)]
+                 (for [item (vals (:patients @state/state))]
                    ^{:key (:id item)}
                    [:tr
                     [rowcol (:name item)]
@@ -151,12 +151,18 @@
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
+;; (defn guard []
+;;   (let [id (-> (session/get :route) :route-params :id js/parseInt)]
+;;     (if (contains? (:patients @state/patients) id)
+
+;;       )))
+
 (defmethod page-contents :update []
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
-        initial (->> @state/state
-                     :patients
-                     (filter #(= (:id %) id)) first
-                     (s/unform :hs.front.spec/patient))
+        patient (-> @state/state
+                    :patients
+                    (get id))
+        initial (s/unform :hs.front.spec/patient patient)
         on-submit
         (fn [v]
           (state/update-patient v)
@@ -222,5 +228,6 @@
   (bidi/path-for app-routes :update :id 13)
   (->> @state/state :patients (filter #(= (:id %) 360)) first)
   (def d (js/Date. (.now js/Date)))
+  @state
   (type d)
   (format-date d))

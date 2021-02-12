@@ -15,13 +15,16 @@
 
 (defn ok? [status] (< status 300))
 
-(def state (r/atom {:patients []}))
+(def state (r/atom {:patients {}}))
 
 (defn get-patients []
   (go (let [{:keys [status body]}
             (<! (http/get (get-url "/api/patients") {:with-credentials? false}))]
         (swap! state assoc :patients
-               (->> body :patients (map #(s/conform :hs.front.spec/patient %))))
+               (->> body
+                    :patients
+                    (map #(s/conform :hs.front.spec/patient %))
+                    (reduce #(assoc %1 (:id %2) %2 ) {})))
         {:ok (< (:status status) 300)})))
 
 (defn update-patient [patient]
