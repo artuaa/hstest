@@ -10,6 +10,7 @@
    [bidi.bidi :as bidi]
    [clojure.spec.alpha :as s]
    [reagent.core :as r]
+   [hs.front.events :refer [emit!]]
    [clojure.string :as str]))
 
 (def app-routes
@@ -176,6 +177,7 @@
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
            [:div [:div {:class "my-4"}
+                  [:button {:on-click #(emit "hey" "hop")}  "test"]
                   [:a {:class "hover:underline mr-4"
                        :href (bidi/path-for app-routes :index)} "HOME"]
                   [:a {:class "hover:underline"

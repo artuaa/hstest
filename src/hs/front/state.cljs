@@ -16,6 +16,8 @@
    (merge req {:url (str "http://localhost:8080" (:url req))
                :with-credentials? false})))
 
+(defn show-error [message] (j/alert message))
+
 (defn ok? [status] (< status 300))
 
 (def app-state (r/atom {:patients {}}))
@@ -27,14 +29,14 @@
        (state assoc :patients)))
 
 (defn patient-loaded [state patient]
-  (state assoc (:id patient) patient))
+  (let [conformed (s/conform :hs.front.spec/patient patient)]
+    (state assoc (:id conformed) conformed)))
 
 (defn patient-deleted [state id]
   (dissoc-in state [:patients id]))
 
 (defn get-patients! []
-  (go (let [{:keys [status body]}
-            (<! (http/get (get-url "/api/patients") {:with-credentials? false}))]
+  (go (let [{:keys [status body]} (<! (request! {:method :get :url "/api/patients"}))]
         (swap! state assoc :patients
                (->> body
                     :patients
