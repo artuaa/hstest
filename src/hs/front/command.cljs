@@ -18,9 +18,5 @@
         ;; :notification/add (handle-add-notification! payload)
         ;; :notification/remove (handle-remove-notification! payload)
 
-        ;; :patient/received (patient-received)
-        :patients/received (patients-received)
-        ;; :patient/deleted (patient-deleted)
-
         (js/console.error (str "Error: unhandled command: " command))))
     0)))

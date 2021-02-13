@@ -160,25 +160,27 @@
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
-;; (defn guard []
-;;   (let [id (-> (session/get :route) :route-params :id js/parseInt)]
-;;     (if (contains? (:patients @state/patients) id)
-
-;;       )))
+(defn guard []
+  (let [id (-> (session/get :route) :route-params :id js/parseInt)
+        patient (-> @app-state :patients (get id))]
+    (if (nil? patient)
+      (do (dispatch! :patients/get-one id)
+          "patient not found :(")
+      "loaded")))
 
 (defmethod page-contents :update []
-  (let [id (-> (session/get :route) :route-params :id js/parseInt)
-        patient (-> @state/state
-                    :patients
-                    (get id))
-        initial (s/unform :hs.front.spec/patient patient)
-        on-submit
-        (fn [v]
-          (dispatch! :patients/update v)
-          (accountant/navigate! "/"))]
-
-    (js/console.log initial)
-    [form initial on-submit]))
+  (guard)
+  ;; (let [id (-> (session/get :route) :route-params :id js/parseInt)
+  ;;       patient (-> @state/state
+  ;;                   :patients
+  ;;                   (get id))
+  ;;       initial (s/unform :hs.front.spec/patient patient)
+  ;;       on-submit
+  ;;       (fn [v]
+  ;;         (dispatch! :patients/update v)
+  ;;         (accountant/navigate! "/"))]
+  ;;   [form initial on-submit])
+  )
 
 (defmethod page-contents :default [] [:div "page not found"])
 

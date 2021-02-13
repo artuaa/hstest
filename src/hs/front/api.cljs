@@ -72,10 +72,8 @@
                (with-error-handling #(emit! :patient/updated patient))))
 
 (defn delete-patient! [id]
-  (do-request! :delete (str "/api/patient/" id) note
+  (do-request! :delete (str "/api/patient/" id)
                (with-error-handling #(emit! :patient/deleted id))))
 
 (comment
   (get-patients!))
-;; (defn do-search! [text]
-;;   (println "TODO: Submit search" text))

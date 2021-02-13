@@ -11,13 +11,15 @@
 
 (defn patient-received [state patient]
   (let [conformed (s/conform :hs.front.spec/patient patient)]
-    (state assoc (:id conformed) conformed)))
+    (assoc-in state [:patients (:id conformed)] conformed)))
 
 (defn patient-deleted [state id]
   (dissoc state [:patients id]))
 
 
 (register-handler! :patients/received patients-received)
+
+(register-handler! :patient/received patient-received)
 
 (register-handler! :patient/deleted patient-deleted)
 
