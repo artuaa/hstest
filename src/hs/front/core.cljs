@@ -16,10 +16,14 @@
    [hs.front.handlers]
    [clojure.string :as str]))
 
-(def all-patients
+(def select-patients
   (ratom/make-reaction
    #(-> @(ratom/cursor app-state [:patients])
         vals vec)))
+
+;; (defn select-patient [id]
+;;   (ratom/make-reaction
+;;    #(@(ratom/cursor app-state [:patients id]))))
 
 (def app-routes
   ["/" {"" :index
@@ -56,7 +60,7 @@
                   [headcol ""]
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
-                 (for [item @all-patients]
+                 (for [item @select-patients]
                    ^{:key (:id item)}
                    [:tr
                     [rowcol (:name item)]
@@ -160,27 +164,24 @@
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
-(defn guard []
+(defn wrap-preload [page]
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         patient (-> @app-state :patients (get id))]
     (if (nil? patient)
       (do (dispatch! :patients/get-one id)
           "patient not found :(")
-      "loaded")))
+      [page patient])))
+
+(defn update-page [patient]
+  (let [initial (s/unform :hs.front.spec/patient patient)
+        on-submit
+        (fn [v]
+          (dispatch! :patients/update v)
+          (accountant/navigate! "/"))]
+    [form initial on-submit]))
 
 (defmethod page-contents :update []
-  (guard)
-  ;; (let [id (-> (session/get :route) :route-params :id js/parseInt)
-  ;;       patient (-> @state/state
-  ;;                   :patients
-  ;;                   (get id))
-  ;;       initial (s/unform :hs.front.spec/patient patient)
-  ;;       on-submit
-  ;;       (fn [v]
-  ;;         (dispatch! :patients/update v)
-  ;;         (accountant/navigate! "/"))]
-  ;;   [form initial on-submit])
-  )
+  (-> update-page wrap-preload))
 
 (defmethod page-contents :default [] [:div "page not found"])
 
