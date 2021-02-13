@@ -10,8 +10,16 @@
    [bidi.bidi :as bidi]
    [clojure.spec.alpha :as s]
    [reagent.core :as r]
-   [hs.front.events :refer [emit!]]
+   [reagent.ratom :as ratom]
+   [hs.front.command :refer [dispatch!]]
+   [hs.front.state :refer [app-state]]
+   [hs.front.handlers]
    [clojure.string :as str]))
+
+(def all-patients
+  (ratom/make-reaction
+   #(-> @(ratom/cursor app-state [:patients])
+        vals vec)))
 
 (def app-routes
   ["/" {"" :index
@@ -26,7 +34,7 @@
               (time/to-default-time-zone date))))
 
 (defmethod page-contents :index []
-  (state/get-patients)
+  (dispatch! :patients/get-many)
   (fn [] (let [headcol (fn [child]
                          [:th {:scope "col"
                                :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
@@ -48,7 +56,7 @@
                   [headcol ""]
                   [headcol "Actions"]]]
                 [:tbody {:class "bg-white divide-y divide-gray-200"}
-                 (for [item (vals (:patients @state/state))]
+                 (for [item @all-patients]
                    ^{:key (:id item)}
                    [:tr
                     [rowcol (:name item)]
@@ -61,7 +69,7 @@
                           :class "text-indigo-600 hover:text-indigo-900"}
                       "Edit"]]
                     [rowcol
-                     [:button {:on-click #(state/delete-patient (:id item))
+                     [:button {:on-click #(dispatch! :patients/delete (:id item))
                                :class "text-red-600 hover:text-red-900"}
                       "Delete"]]])]]]]]])))
 
@@ -177,13 +185,11 @@
 (defn app []
   (fn [] (let [route (-> (session/get :route) :current-page)]
            [:div [:div {:class "my-4"}
-                  [:button {:on-click #(emit "hey" "hop")}  "test"]
                   [:a {:class "hover:underline mr-4"
                        :href (bidi/path-for app-routes :index)} "HOME"]
                   [:a {:class "hover:underline"
                        :href (bidi/path-for app-routes :create)} "CREATE"]]
-            ;; ^{:key route} [page-contents route]
-            ])))
+            ^{:key route} [page-contents route]])))
 
 (defn mount []
   (r.dom/render [app] (js/document.getElementById "root")))
@@ -231,6 +237,6 @@
   (bidi/path-for app-routes :update :id 13)
   (->> @state/state :patients (filter #(= (:id %) 360)) first)
   (def d (js/Date. (.now js/Date)))
-  @state
+  @app-state
   (type d)
   (format-date d))
