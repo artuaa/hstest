@@ -64,12 +64,16 @@
                (with-error-handling #(emit! :patient/received (:patient %)))))
 
 (defn create-patient! [patient]
-  (do-request! :post "/api/patient" patient
+  (do-request! :post "/api/patient" {:patient patient}
                (with-error-handling #(emit! :patient/created %))))
 
 (defn update-patient! [patient]
-  (do-request! :put (str "/api/patient" (:id patient)) note
-               (with-error-handling #(emit! :patient/updated note))))
+  (do-request! :put (str "/api/patient/" (:id patient)) {:patient patient}
+               (with-error-handling #(emit! :patient/updated patient))))
+
+(defn delete-patient! [id]
+  (do-request! :delete (str "/api/patient/" id) note
+               (with-error-handling #(emit! :patient/deleted id))))
 
 (comment
   (get-patients!))

@@ -13,6 +13,7 @@
         :patients/get-one (api/get-patient! payload)
         :patients/create (api/create-patient! payload)
         :patients/update (api/update-patient! payload)
+        :patients/delete (api/delete-patient! payload)
 
         ;; :notification/add (handle-add-notification! payload)
         ;; :notification/remove (handle-remove-notification! payload)

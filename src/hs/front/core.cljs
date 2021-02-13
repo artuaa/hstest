@@ -156,7 +156,7 @@
                  :address ""}
         on-submit
         (fn [v]
-          (state/create-patient v)
+          (dispatch! :patients/create v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
@@ -174,7 +174,7 @@
         initial (s/unform :hs.front.spec/patient patient)
         on-submit
         (fn [v]
-          (state/update-patient v)
+          (dispatch! :patients/update v)
           (accountant/navigate! "/"))]
 
     (js/console.log initial)

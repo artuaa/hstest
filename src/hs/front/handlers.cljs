@@ -19,6 +19,12 @@
 
 (register-handler! :patients/received patients-received)
 
+(register-handler! :patient/deleted patient-deleted)
+
+;; (register-handler! :patient/created patient-created)
+
+;; (register-handler! :patient/updated patient-updated)
+
         ;; :patient/received (patient-received)
         ;; :patients/received (patients-received)
         ;; :patient/deleted (patient-deleted)

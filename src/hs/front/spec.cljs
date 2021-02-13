@@ -13,8 +13,7 @@
    (fn [value]
      (when value (tfmt/unparse
                   (tfmt/formatter "YYYY-MM-dd")
-                  (time/to-default-time-zone value))))
-   ))
+                  (time/to-default-time-zone value))))))
 
 (s/def :patient/birthdate (s/and
                            ::base/ne-string

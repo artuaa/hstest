@@ -10,9 +10,7 @@
 (defn register-handler! [event-type handler-fn]
   (swap! handlers assoc event-type handler-fn))
 
-
 (events/register-listener!
  (fn [type payload]
-   (println "register")
    (when-let [handler-fn (get @handlers type)]
      (swap! app-state #(handler-fn  % payload)))))
