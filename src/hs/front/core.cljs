@@ -20,7 +20,6 @@
   (ratom/make-reaction
    #(-> @(ratom/cursor app-state [:patients])
         vals vec)))
-
 ;; (defn select-patient [id]
 ;;   (ratom/make-reaction
 ;;    #(@(ratom/cursor app-state [:patients id]))))

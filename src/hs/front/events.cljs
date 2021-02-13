@@ -26,4 +26,6 @@
 
   (register-listener! dispatch!)
 
+  (emit! :patient/received [{:id 1}])
+
   (emit! :foo {:name "cooper"}))

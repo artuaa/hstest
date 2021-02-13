@@ -71,6 +71,13 @@
   (def ctx (start config))
   (stop @ctx)
   (jdbc/execute! (:db @ctx) "delete from patients;")
+(def patient {:name "hello"
+              :gender "female"
+              :address "hlelo"
+              :policy "1234123412341234"
+              :birthdate "2012-01-01"})
+
+  (jdbc/insert! (:db @ctx) :patients patient)
   (def req {:request-method :get :uri "/"})
   (bidi/match-route* routes (:uri req) req)
   (root-handler req))

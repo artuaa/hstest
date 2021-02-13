@@ -3,6 +3,15 @@
             [clojure.spec.alpha :as s]
             [clojure.java.jdbc :as j]))
 
+(defn now [] (java.time.LocalDateTime/now))
+
+(defn with-created [patient]
+  (let [n (now)]
+    (assoc patient :created n :updated n)))
+
+(defn with-updated [patient]
+  (assoc patient :updated (now)))
+
 (defn- parse-id [val]
   (try (Integer/parseInt val)
        (catch Exception e nil)))
@@ -25,7 +34,7 @@
                 :error (s/explain-data :hs.back.spec/patient entity)}}))))
 
 (defn get-many [{req :request db :db}]
-  (let [query "select * from patients"
+  (let [query "select * from patients order by updated desc"
         patients (j/query db query)]
     {:status 200
      :body {:patients (vec patients)}}))
@@ -45,7 +54,7 @@
 (defn- update-patient [{req :request db :db}]
   (let [id (-> req :params :id)
         patient (-> req :body :patient)
-        updated (-> (j/update! db :patients patient ["id = ?" id])
+        updated (-> (j/update! db :patients (with-updated patient) ["id = ?" id])
                     first zero? not)]
     (if updated
       {:status 200}
@@ -56,7 +65,7 @@
 
 (defn create-patient [{req :request db :db}]
   (let [patient (-> req :body :patient)
-        id (-> (j/insert! db :patients patient) first :id)]
+        id (-> (j/insert! db :patients (with-created patient)) first :id)]
     {:status 201 :body {:id id}}))
 
 (def create-handler (-> create-patient wrap-patient))

@@ -18,6 +18,12 @@
 (s/def :patient/birthdate (s/and
                            ::base/ne-string
                            ::->date))
+(s/def :patient/created (s/and
+                           ::base/ne-string
+                           ::->date))
+(s/def :patient/updated (s/and
+                           ::base/ne-string
+                           ::->date))
 
 (s/def ::patient
   (s/keys :req-un [:patient/name
@@ -25,7 +31,9 @@
                    :patient/address
                    :patient/gender
                    :patient/policy]
-          :opt-un [:patient/id]))
+          :opt-un [:patient/id
+                   :patient/created
+                   :patient/updated]))
 
 (comment (def p {:id 1234
                  :name "Alex"
@@ -33,7 +41,6 @@
                  :birthdate "2023"
                  :address "Moscow, Red Square"
                  :policy 1111111111111111})
-         (validate p)
          (s/valid? :patient/policy "1234123412341234")
          (s/explain-data :hs/patient p)
          (s/conform :patient/birthdate "2933")
