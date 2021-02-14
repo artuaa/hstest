@@ -34,7 +34,7 @@
                 :error (s/explain-data :hs.back.spec/patient entity)}}))))
 
 (defn get-many [{req :request db :db}]
-  (let [query "select * from patients order by updated desc"
+  (let [query "select * from patients order by created desc"
         patients (j/query db query)]
     {:status 200
      :body {:patients (vec patients)}}))
