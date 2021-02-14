@@ -8,10 +8,3 @@
    :body (sp/render-file "table.html" {:title "Patients" :patients
                                        (repo/get-patients ctx)
                                        })})
-
-(defn form-page [ctx]
-  {:status 200
-   :headers {"content-type" "text/html; charset=utf-8"}
-   :body (sp/render-file "form.html" {:title "Patients" :patients
-                                       (repo/get-patients ctx)
-                                       })})

@@ -10,7 +10,9 @@
 (def base-url "http://localhost:8080")
 
 (defn- is-json-response [res]
-  (str/starts-with? (.get (.-headers res) "Content-Type") "application/json"))
+  (if-let [ct (.get (.-headers res) "Content-Type")]
+    (str/starts-with? ct "application/json")
+    false))
 
 (defn do-request!
   ([method path cb] (do-request! method path nil cb))
@@ -29,7 +31,6 @@
                      (->
                       (assoc :body serialized-body)
                       (update :headers merge {"content-type" "application/json"}))
-
                      :always
                      clj->js))
          (.then (fn [res]
@@ -85,5 +86,6 @@
   (-> (js/fetch "http://localhost:8080/api/patients")
       (.then #(reset! resp %)))
   @resp
+  (is-json-response @resp)
   (str/starts-with? (.get (.-headers @resp) "Content-Type") "application/json")
   (get-patients!))
