@@ -14,7 +14,7 @@
     (assoc-in state [:patients (:id conformed)] conformed)))
 
 (defn patient-deleted [state id]
-  (dissoc state [:patients id]))
+  (update-in state [:patients] dissoc id))
 
 
 (register-handler! :patients/received patients-received)
@@ -23,10 +23,7 @@
 
 (register-handler! :patient/deleted patient-deleted)
 
-;; (register-handler! :patient/created patient-created)
 
-;; (register-handler! :patient/updated patient-updated)
-
-        ;; :patient/received (patient-received)
-        ;; :patients/received (patients-received)
-        ;; :patient/deleted (patient-deleted)
+(comment
+ (def state {:patients {1 {} 2 {}}})
+ (patient-deleted state 1))

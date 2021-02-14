@@ -4,9 +4,13 @@
             [clojure.walk :as walk]
             ;; [camel-snake-kebab.core :as csk]
             ;; [camel-snake-kebab.extras :as cske]
-            ))
+
+            [clojure.string :as str]))
 
 (def base-url "http://localhost:8080")
+
+(defn- is-json-response [res]
+  (str/starts-with? (.get (.-headers res) "Content-Type") "application/json"))
 
 (defn do-request!
   ([method path cb] (do-request! method path nil cb))
@@ -30,7 +34,7 @@
                      clj->js))
          (.then (fn [res]
                   (if (.-ok res)
-                    (when (= 200 (.-status res))
+                    (when (is-json-response res)
                       (.json res))
                     (throw (ex-info "API Request Failed"
                                     {:status-code (.-status res)
@@ -42,7 +46,8 @@
                       (walk/keywordize-keys)
                       (err/ok)
                       (cb)))
-         (.catch #(cb (err/error %)))))))
+         (.catch #(do (println %)
+                      (cb (err/error %))))))))
 
 (defn- display-error [err]
   (emit! :notification/added
@@ -76,4 +81,9 @@
                (with-error-handling #(emit! :patient/deleted id))))
 
 (comment
+  (def resp (atom nil))
+  (-> (js/fetch "http://localhost:8080/api/patients")
+      (.then #(reset! resp %)))
+  @resp
+  (str/starts-with? (.get (.-headers @resp) "Content-Type") "application/json")
   (get-patients!))
