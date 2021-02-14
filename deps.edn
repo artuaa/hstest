@@ -2,6 +2,7 @@
  ["src" "resources", "target"]
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.764"}
+  selmer/selmer {:mvn/version "1.12.33"}
   reagent/reagent {:mvn/version "1.0.0"}
   reagent-utils/reagent-utils {:mvn/version "0.3.3"}
   com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}

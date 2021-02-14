@@ -39,6 +39,11 @@
     {:status 200
      :body {:patients (vec patients)}}))
 
+(defn get-patients [{db :db}]
+  (let [query "select * from patients order by created desc"
+        patients (j/query db query)]
+   (vec patients)))
+
 (defn- get-one [{req :request db :db}]
   (let [id (-> req :params :id)
         query ["select * from patients where id = ?" id]

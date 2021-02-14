@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <header>
+
+      <h1>{{header}}</h1>
+
+      <ul id="navigation">
+
+        {% for item in nav-items %}
+        <li>
+            <a href="{{item.link}}">{{item.name}}</a>
+        </li>
+        {% endfor %}
+
+      </ul>
+    </header>
+  </body>
+</html>

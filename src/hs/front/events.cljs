@@ -24,8 +24,6 @@
      (println "Listener 2")
      (println "Type:" type "Payload:" payload)))
 
-  (register-listener! dispatch!)
-
   (emit! :patient/received [{:id 1}])
 
   (emit! :foo {:name "cooper"}))
