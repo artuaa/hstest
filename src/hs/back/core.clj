@@ -52,9 +52,6 @@
           (wrap-json-body {:keywords? true})
           wrap-with-logger))))
 
-(def config {:server {:port 8080}
-             :db {:dbname "db_dev"}})
-
 (defn start [config]
   (let [ctx (atom {:config config})
         db (dbcore/connection @ctx)
@@ -66,6 +63,9 @@
 
 (defn stop [ctx]
   (when-let [server (:server ctx)] (.stop server)))
+
+(def config {:server {:port 8080}
+             :db {:dbname "db_dev"}})
 
 (defn -main [& args]
   (start config))
