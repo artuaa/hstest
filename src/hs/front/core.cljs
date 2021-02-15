@@ -11,9 +11,8 @@
    [clojure.spec.alpha :as s]
    [reagent.core :as r]
    [reagent.ratom :as ratom]
-   [hs.front.command :refer [dispatch!]]
+   [hs.front.events :refer [dispatch!]]
    [hs.front.state :refer [app-state]]
-   [hs.front.handlers]
    [clojure.string :as str]))
 
 (def select-patients
@@ -29,6 +28,8 @@
         "patient" {"" :create
                    ["/" :id] :update}}])
 
+(dispatch! :app/init)
+
 (defmulti page-contents identity)
 
 (defn format-date [date]
@@ -37,7 +38,6 @@
               (time/to-default-time-zone date))))
 
 (defmethod page-contents :index []
-  (dispatch! :patients/get-many)
   (fn [] (let [headcol (fn [child]
                          [:th {:scope "col"
                                :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
