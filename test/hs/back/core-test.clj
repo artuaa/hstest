@@ -1,5 +1,5 @@
-(ns main-test
-  (:require [hs.main :as sut]
+(ns hs.back.core-test
+  (:require [hs.back.core :as sut]
             [clojure.test :refer :all]
             [matcho.core :as m]
             [clojure.java.jdbc :as jdbc]
