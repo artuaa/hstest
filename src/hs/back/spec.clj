@@ -37,14 +37,3 @@
           :opt-un [:patient/id
                    :patient/created
                    :patient/updated]))
-
-(comment (def p {:id 1234
-                 :name "Alex"
-                 :gender "mALe"
-                 :birthdate "2023"
-                 :address "Moscow, Red Square"
-                 :policy 1111111111111111})
-         (s/valid? :patient/policy "1234123412341234")
-         (s/explain-data :hs/patient p)
-         (s/conform :patient/birthdate "2933")
-         (s/conform ::->date "2012-11-11"))
