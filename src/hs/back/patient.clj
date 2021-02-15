@@ -18,7 +18,6 @@
 
 (defn wrap-id [handler]
   (fn [{req :request :as ctx}]
-    (print (:route-params req))
     (if-let [id (-> req :params :id parse-id)]
       (handler (assoc-in ctx [:request :params :id] id))
       {:status 400 :body {:error_message "id is invalid"}})))
@@ -83,22 +82,3 @@
          :body {:error_message "patient not found"}})))
 
 (def delete-handler (-> delete-patient wrap-id))
-
-(comment
-  (def db)
-  (-> (j/update! db :patients {:name "hello"} ["id = ?" 340])
-      first
-      zero?)
-
-  (j/insert! db :patients {:id "hello2" :birthdate (s/conform :hs/birthdate "1234") :name "hello"}))
-
-(s/valid? :hs.back.spec/patient {})
-(update-handler {:params {:id "13"}})
-
-(def patient {:name "hello"
-              :gender "female"
-              :address "hlelo"
-              :policy "1234123412341234"
-              :birthdate "2012-01-01"})
-
-(update-handler {:params {:id "13"} :body {:patient patient}})
