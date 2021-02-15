@@ -42,12 +42,15 @@
     (handler (assoc-in ctx [:request :params] route-params))))
 
 (defn app [ctx]
-  (-> (fn [req] (root-handler (assoc ctx :request req)))
-      (wrap-cors :access-control-allow-origin [#"http://localhost:9500"] :access-control-allow-methods [:get :put :post :delete])
-      (wrap-resource "public")
-      wrap-json-response
-      (wrap-json-body {:keywords? true})
-      wrap-with-logger))
+  (let [naked (fn [req] (root-handler (assoc ctx :request req)))]
+    (if (-> ctx :config :handler :naked)
+      naked
+      (-> naked
+          (wrap-cors :access-control-allow-origin [#"http://localhost:9500"] :access-control-allow-methods [:get :put :post :delete])
+          (wrap-resource "public")
+          wrap-json-response
+          (wrap-json-body {:keywords? true})
+          wrap-with-logger))))
 
 (def config {:server {:port 8080}
              :db {:dbname "db_dev"}})
@@ -71,11 +74,12 @@
   (def ctx (start config))
   (stop @ctx)
   (jdbc/execute! (:db @ctx) "delete from patients;")
-(def patient {:name "hello"
-              :gender "female"
-              :address "hlelo"
-              :policy "1234123412341234"
-              :birthdate "2012-01-01"})
+
+  (def patient {:name "hello"
+                :gender "female"
+                :address "hlelo"
+                :policy "1234123412341234"
+                :birthdate "2012-01-01"})
 
   (jdbc/insert! (:db @ctx) :patients patient)
   (def req {:request-method :get :uri "/"})

@@ -6,14 +6,10 @@
             [clojure.spec.alpha :as s]
             [clojure.java.io :as io]))
 
-;; (defn init-db [db] (jdbc/execute! db "drop table if exists patients;"))
-                    ;; (->> (io/resource "sql/create.sql")
-                    ;;      io/file
-                    ;;      slurp
-                    ;;      (jdbc/execute! db))
 
-(def ctx (sut/start {:db {:dbname  "db_test"}}))
-  ;; (init-db (:db @ctx))
+(def ctx (sut/start {:db {:dbname  "db_test"
+                          :handler {:naked true}}}))
+
 (def handler (:handler @ctx))
 
 (defn match [req exp]
@@ -27,12 +23,7 @@
         :policy "1234123412341234"
         :gender "male"})
 
-(deftest test-create-upd-del
-  (match
-   {:request-method :get
-    :uri "/health"}
-    {:status 200})
-
+(deftest test-crud
   (def create-resp (match {:request-method :post
                            :uri "/api/patient"
                            :body {:patient p}}
@@ -54,18 +45,8 @@
   (match
    {:request-method :delete
     :uri (format "/api/patient/%s" created-id)}
-    {:status 200}))
+    {:status 200})
 
-(deftest test-getall
-  (handler {:request-method :post
-            :uri "/api/patient"
-            :body {:patient p}})
-  (handler {:request-method :post
-            :uri "/api/patient"
-            :body {:patient p}})
-  (handler {:request-method :post
-            :uri "/api/patient"
-            :body {:patient p}})
 
   (match
    {:request-method :get
