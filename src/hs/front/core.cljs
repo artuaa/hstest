@@ -11,7 +11,8 @@
    [clojure.spec.alpha :as s]
    [reagent.core :as r]
    [reagent.ratom :as ratom]
-   [hs.front.events :refer [dispatch!]]
+   [hs.front.events :refer [emit!]]
+   [hs.front.effects]
    [hs.front.state :refer [app-state]]
    [clojure.string :as str]))
 
@@ -28,7 +29,7 @@
         "patient" {"" :create
                    ["/" :id] :update}}])
 
-(dispatch! :app/init)
+(emit! :app/init)
 
 (defmulti page-contents identity)
 
@@ -72,7 +73,7 @@
                           :class "text-indigo-600 hover:text-indigo-900"}
                       "Edit"]]
                     [rowcol
-                     [:button {:on-click #(dispatch! :patients/delete (:id item))
+                     [:button {:on-click #(emit! :patients/delete (:id item))
                                :class "text-red-600 hover:text-red-900"}
                       "Delete"]]])]]]]]])))
 
@@ -159,7 +160,7 @@
                  :address ""}
         on-submit
         (fn [v]
-          (dispatch! :patients/create v)
+          (emit! :patients/create v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
@@ -167,7 +168,7 @@
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         patient (-> @app-state :patients (get id))]
     (if (nil? patient)
-      (do (dispatch! :patients/get-one id)
+      (do (emit! :patients/get-one id)
           "patient not found :(")
       [page patient])))
 
@@ -175,7 +176,7 @@
   (let [initial (s/unform :hs.front.spec/patient patient)
         on-submit
         (fn [v]
-          (dispatch! :patients/update v)
+          (emit! :patients/update v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 

@@ -29,9 +29,14 @@
 (defn- patient-deleted [state id]
   (update-in state [:patients] dissoc id))
 
-
 (register-handler! :patients/received patients-received)
 
 (register-handler! :patient/received patient-received)
 
 (register-handler! :patient/deleted patient-deleted)
+
+(register-handler! :patients/update (fn [state _]
+                   (swap! state assoc-in [:page :form :pending] true)))
+
+(register-handler! :patient/updated (fn [state _]
+                   (swap! state assoc-in [:page :form :pending] false)))
