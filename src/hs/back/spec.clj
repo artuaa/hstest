@@ -15,15 +15,18 @@
        (catch Exception e
          ::s/invalid)))))
 
-(s/def :patient/birthdate (s/and
-                           ::base/ne-string
-                           ::->date))
-(s/def :patient/created (s/and
-                           ::base/ne-string
-                           ::->date))
-(s/def :patient/updated (s/and
-                           ::base/ne-string
-                           ::->date))
+(s/def :patient/birthdate
+  (s/and
+   ::base/ne-string
+   ::->date))
+(s/def :patient/created
+  (s/and
+   ::base/ne-string
+   ::->date))
+(s/def :patient/updated
+  (s/and
+   ::base/ne-string
+   ::->date))
 
 (s/def ::patient
   (s/keys :req-un [:patient/name
