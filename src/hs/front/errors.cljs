@@ -1,5 +1,4 @@
 (ns hs.front.errors
-  "This namespace comes from Lesson 24: Handling Exceptions and Errors."
   (:refer-clojure :exclude [map]))
 
 (defn ok [val]
