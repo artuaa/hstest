@@ -30,7 +30,6 @@
 
   (def created-id (-> create-resp :body :id))
 
-  ;; update
   (match
    {:request-method :put
     :uri (format "/api/patient/0" created-id)

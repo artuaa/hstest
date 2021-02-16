@@ -1,6 +1,5 @@
 (ns hs.back.patient
-  (:require [hs.back.spec]
-            [clojure.spec.alpha :as s]
+  (:require [clojure.spec.alpha :as s]
             [clojure.java.jdbc :as j]))
 
 (defn now [] (java.time.LocalDateTime/now))

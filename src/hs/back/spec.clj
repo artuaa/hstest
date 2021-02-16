@@ -29,11 +29,14 @@
    ::->date))
 
 (s/def ::patient
-  (s/keys :req-un [:patient/name
-                   :patient/birthdate
-                   :patient/address
-                   :patient/gender
-                   :patient/policy]
-          :opt-un [:patient/id
-                   :patient/created
-                   :patient/updated]))
+  (s/keys
+   :req-un
+   [:patient/name
+    :patient/birthdate
+    :patient/address
+    :patient/gender
+    :patient/policy]
+   :opt-un
+   [:patient/id
+    :patient/created
+    :patient/updated]))

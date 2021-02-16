@@ -10,11 +10,15 @@
    [ring.middleware.cors :refer [wrap-cors]]
    [ring.logger :refer [wrap-with-logger]]
    [hs.back.spec]
-   [hs.back.db.core :as dbcore]
-   [hs.back.server.core :as server]
+   [hs.back.db :as db]
+   [ring.adapter.jetty :as adapter]
    [ring.util.response :as rr]
    [clojure.java.jdbc :as jdbc])
   (:gen-class))
+
+
+(defn start-server [cfg handler]
+  (adapter/run-jetty handler {:port (:port cfg) :join? false}))
 
 (defn index-handler [req]
   (-> (rr/resource-response "index.html" {:root "public"})
@@ -54,11 +58,11 @@
 
 (defn start [config]
   (let [ctx (atom {:config config})
-        db (dbcore/connection @ctx)
+        db (db/connection @ctx)
         _ (swap! ctx assoc :db db)
         handler (app @ctx)
         _ (swap! ctx assoc :handler handler)
-        server (when (:server config) (server/start {:port (get-in config [:server :port])} handler))
+        server (when (:server config) (start-server {:port (get-in config [:server :port])} handler))
         _ (swap! ctx assoc :server server)] ctx))
 
 (defn stop [ctx]

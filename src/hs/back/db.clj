@@ -1,4 +1,4 @@
-(ns hs.back.db.core)
+(ns hs.back.db)
 
 (defn connection [ctx]
   (let [cfg (get-in ctx [:config :db])]
