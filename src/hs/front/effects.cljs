@@ -59,13 +59,19 @@
          (err/map f)
          (err/unwrap-or display-error))))
 
+(defn- with-hidden-error-handling [f]
+  (fn [res]
+    (->> res
+         (err/map f)
+         (err/unwrap-or js/console.error))))
+
 (defn- get-patients! []
   (do-request! :get "/api/patients"
-               (with-error-handling #(emit! :patients/received (:patients %)))))
+               (with-hidden-error-handling #(emit! :patients/received (:patients %)))))
 
 (defn- get-patient! [id]
   (do-request! :get (str "/api/patient/" id)
-               (with-error-handling #(emit! :patient/received (:patient %)))))
+               (with-hidden-error-handling #(emit! :patient/received (:patient %)))))
 
 (defn- create-patient! [patient]
   (do-request! :post "/api/patient" {:patient patient}
