@@ -73,7 +73,7 @@
                           :class "text-indigo-600 hover:text-indigo-900"}
                       "Edit"]]
                     [rowcol
-                     [:button {:on-click #(emit! :patients/delete (:id item))
+                     [:button {:on-click #(emit! :patient/delete (:id item))
                                :class "text-red-600 hover:text-red-900"}
                       "Delete"]]])]]]]]])))
 
@@ -160,7 +160,7 @@
                  :address ""}
         on-submit
         (fn [v]
-          (emit! :patients/create v)
+          (emit! :patient/create v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 
@@ -168,7 +168,7 @@
   (let [id (-> (session/get :route) :route-params :id js/parseInt)
         patient (-> @app-state :patients (get id))]
     (if (nil? patient)
-      (do (emit! :patients/get-one id)
+      (do (emit! :patient/get id)
           "patient not found :(")
       [page patient])))
 
@@ -176,7 +176,7 @@
   (let [initial (s/unform :hs.front.spec/patient patient)
         on-submit
         (fn [v]
-          (emit! :patients/update v)
+          (emit! :patient/update v)
           (accountant/navigate! "/"))]
     [form initial on-submit]))
 

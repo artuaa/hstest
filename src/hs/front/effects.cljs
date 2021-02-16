@@ -24,10 +24,7 @@
                                 (clj->js)
                                 (js/JSON.stringify)))]
      (-> (js/fetch (str base-url path)
-                   (cond-> {:method (name method)
-                            ;; :headers {"Authorization" (str "Bearer " js/API_TOKEN)}
-                            ;; :credentials "include"
-                            }
+                   (cond-> {:method (name method)}
                      (some? body)
                      (->
                       (assoc :body serialized-body)
@@ -73,12 +70,12 @@
 (defn- create-patient! [patient]
   (do-request! :post "/api/patient" {:patient patient}
                (with-error-handling #(do (emit! :patient/created %)
-                                         (emit! :patients/get-many)))))
+                                         (emit! :patients/get)))))
 
 (defn- update-patient! [patient]
   (do-request! :put (str "/api/patient/" (:id patient)) {:patient patient}
                (with-error-handling #(do (emit! :patient/updated patient)
-                                         (emit! :patients/get-many)))))
+                                         (emit! :patients/get)))))
 
 (defn- delete-patient! [id]
   (do-request! :delete (str "/api/patient/" id)
@@ -99,10 +96,9 @@
   (swap! effects assoc event-type handler-fn))
 
 (register-effect! :app/init get-patients!)
-(register-effect! :patients/get-one get-patient!)
-(register-effect! :patients/get-one get-patient!)
-(register-effect! :patients/get-many get-patients!)
-(register-effect! :patients/create create-patient!)
-(register-effect! :patients/update update-patient!)
-(register-effect! :patients/delete delete-patient!)
+(register-effect! :patient/get get-patient!)
+(register-effect! :patients/get get-patients!)
+(register-effect! :patient/create create-patient!)
+(register-effect! :patient/update update-patient!)
+(register-effect! :patient/delete delete-patient!)
 (register-effect! :notification/show show-notification!)
