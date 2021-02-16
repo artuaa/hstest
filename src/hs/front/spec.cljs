@@ -15,17 +15,21 @@
                   (tfmt/formatter "YYYY-MM-dd")
                   (time/to-default-time-zone value))))))
 
-(s/def :patient/birthdate (s/and
-                           ::base/ne-string
-                           ::->date))
+(s/def :patient/birthdate
+  (s/and
+   ::base/ne-string
+   ::->date))
 
 (s/def ::patient
-  (s/keys :req-un [:patient/name
-                   :patient/birthdate
-                   :patient/address
-                   :patient/gender
-                   :patient/policy]
-          :opt-un [:patient/id]))
+  (s/keys
+   :req-un
+   [:patient/name
+    :patient/birthdate
+    :patient/address
+    :patient/gender
+    :patient/policy]
+   :opt-un
+   [:patient/id]))
 
 (comment
   (s/conform ::->date "2000")

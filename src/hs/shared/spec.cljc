@@ -1,23 +1,24 @@
 (ns hs.shared.spec
   (:require [clojure.spec.alpha :as s]))
 
-
 (s/def ::ne-string
   (s/and string? not-empty))
 
 (s/def :patient/id int?)
 (s/def :patient/name ::ne-string)
 (s/def :patient/address ::ne-string)
-(s/def :patient/gender (s/and
-                        ::ne-string
-                        (s/conformer
-                         clojure.string/lower-case
-                         identity)
-                        (fn [val] (contains? #{"male" "female"} val))))
+(s/def :patient/gender
+  (s/and
+   ::ne-string
+   (s/conformer
+    clojure.string/lower-case
+    identity)
+   (fn [val] (contains? #{"male" "female"} val))))
 
-(s/def :patient/policy (s/and
-                        ::ne-string
-                        (fn [val] (= (count val) 16))))
+(s/def :patient/policy
+  (s/and
+   ::ne-string
+   (fn [val] (= (count val) 16))))
 
 (comment (def p {:id 1234
                  :name "Alex"

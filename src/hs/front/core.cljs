@@ -20,9 +20,6 @@
   (ratom/make-reaction
    #(-> @(ratom/cursor app-state [:patients])
         vals vec)))
-;; (defn select-patient [id]
-;;   (ratom/make-reaction
-;;    #(@(ratom/cursor app-state [:patients id]))))
 
 (def app-routes
   ["/" {"" :index
@@ -101,14 +98,19 @@
 
 (defn form [initial submit-fn]
   (let [patient (r/atom initial)
+
         errors (r/atom {})
+
         change  (fn [key] (fn [input] (swap! patient assoc key (-> input .-target .-value))))
+
         validate (fn [] (let [exp (s/explain-data :hs.front.spec/patient @patient)]
-                          (js/console.log (clj->js exp))
                           (reset! errors (get-errors exp))))
+
         format-date (fn [date]
                       (tf/unparse (tf/formatter "YYYY-MM-dd") date))
+
         maxdate (format-date (time/now))
+
         mindate (format-date (time/minus (time/now) (time/years 100)))]
     (fn []
       [:form {:class "flex flex-col w-screen max-w-xl"}
@@ -147,7 +149,6 @@
          (fn [e]
            (.preventDefault e)
            (validate)
-           (js/console.log (clj->js @errors))
            (when (empty? @errors)
              (submit-fn (s/conform :hs.front.spec/patient @patient))))}
         "Save"]])))

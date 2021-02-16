@@ -101,4 +101,4 @@
 (register-effect! :patient/create create-patient!)
 (register-effect! :patient/update update-patient!)
 (register-effect! :patient/delete delete-patient!)
-(register-effect! :notification/show show-notification!)
+;; (register-effect! :notification/show show-notification!)
