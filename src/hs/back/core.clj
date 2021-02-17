@@ -13,9 +13,9 @@
    [hs.back.db :as db]
    [ring.adapter.jetty :as adapter]
    [ring.util.response :as rr]
-   [clojure.java.jdbc :as jdbc])
+   [clojure.java.jdbc :as jdbc]
+   [clojure.spec.alpha :as s])
   (:gen-class))
-
 
 (defn start-server [cfg handler]
   (adapter/run-jetty handler {:port (:port cfg) :join? false}))
@@ -81,9 +81,35 @@
 
   (def patient {:name "hello"
                 :gender "female"
-                :address "hlelo"
+                :address "ул. Маяковского, 37 Рязань, Рязанская обл., 390046"
                 :policy "1234123412341234"
-                :birthdate "2012-01-01"})
+                :birthdate "2000-01-01"})
+
+  (def patients [{:name "Patient 1"
+                  :gender "female"
+                  :address "ул. Маяковского, 37 Рязань, Рязанская обл., 390046"
+                  :policy "1234123412341234"
+                  :birthdate "2000-01-01"}
+                 {:name "Patient 2"
+                  :gender "female"
+                  :address "ул. Маяковского, 37 Рязань, Рязанская обл., 390046"
+                  :policy "1234123412341234"
+                  :birthdate "2000-01-01"}
+                 {:name "Patient 3"
+                  :gender "female"
+                  :address "ул. Маяковского, 37 Рязань, Рязанская обл., 390046"
+                  :policy "1234123412341234"
+                  :birthdate "2000-01-01"}
+                 {:name "Patient 4"
+                  :gender "female"
+                  :address "ул. Маяковского, 37 Рязань, Рязанская обл., 390046"
+                  :policy "1234123412341234"
+                  :birthdate "2000-01-01"}])
+
+  (doseq [p patients]
+    (let [conformed (s/conform :hs.back.spec/patient p)]
+      (jdbc/insert! (:db @ctx) :patients (patient/with-created conformed))))
+
 
   (jdbc/insert! (:db @ctx) :patients patient)
   (def req {:request-method :get :uri "/"})
